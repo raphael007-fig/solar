@@ -11,15 +11,17 @@ import {
 } from '@shopify/polaris'
 import DateField from '../../components/DateField'
 
-export interface SolarPanelFormData {
+export interface BatteryFormData {
+  systemType: string
   linkedInverter: string
-  panelGroup: string
   make: string
   model: string
   serialNumber: string
   quantity: string
   equipmentStatus: string
-  ratedPower: string
+  batteryType: string
+  capacity: string
+  voltage: string
   warrantyStart: string
   warrantyEnd: string
   maintenanceFrequency: string
@@ -30,12 +32,19 @@ export interface SolarPanelFormData {
 
 interface Props {
   onClose: () => void
-  onSave: (data: SolarPanelFormData) => void
-  initialData?: Partial<SolarPanelFormData>
+  onSave: (data: BatteryFormData) => void
+  initialData?: Partial<BatteryFormData>
 }
 
+const SYSTEM_TYPE_OPTIONS = [
+  { label: 'Select', value: '' },
+  { label: 'Off-Grid',   value: 'Off-Grid' },
+  { label: 'Hybrid',     value: 'Hybrid' },
+  { label: 'Tied-Grid',  value: 'Tied-Grid' },
+]
+
 const INVERTER_OPTIONS = [
-  { label: 'Choose', value: '' },
+  { label: 'Select', value: '' },
   { label: 'Inv 1', value: 'Inv 1' },
   { label: 'Inv 2', value: 'Inv 2' },
   { label: 'Inv 3', value: 'Inv 3' },
@@ -49,8 +58,16 @@ const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Decommissioned',    value: 'Decommissioned' },
 ]
 
+const BATTERY_TYPE_OPTIONS = [
+  { label: 'Choose battery here', value: '' },
+  { label: 'Lithium-Ion',  value: 'Lithium-Ion' },
+  { label: 'Lead-Acid',    value: 'Lead-Acid' },
+  { label: 'AGM',          value: 'AGM' },
+  { label: 'Gel',          value: 'Gel' },
+]
+
 const MAINTENANCE_FREQ_OPTIONS = [
-  { label: 'Choose maintenance frequency here', value: '' },
+  { label: 'Select maintenance frequency here', value: '' },
   { label: 'Monthly',       value: 'Monthly' },
   { label: 'Quarterly',     value: 'Quarterly' },
   { label: 'Semi-annually', value: 'Semi-annually' },
@@ -60,16 +77,18 @@ const MAINTENANCE_FREQ_OPTIONS = [
 const grid4: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }
 const grid3: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
 
-export default function AddSolarPanelModal({ onClose, onSave, initialData }: Props) {
-  const [form, setForm] = useState<SolarPanelFormData>({
+export default function AddBatteryModal({ onClose, onSave, initialData }: Props) {
+  const [form, setForm] = useState<BatteryFormData>({
+    systemType:           initialData?.systemType           ?? '',
     linkedInverter:       initialData?.linkedInverter       ?? '',
-    panelGroup:           initialData?.panelGroup           ?? '',
     make:                 initialData?.make                 ?? '',
     model:                initialData?.model                ?? '',
     serialNumber:         initialData?.serialNumber         ?? '',
     quantity:             initialData?.quantity             ?? '1',
     equipmentStatus:      initialData?.equipmentStatus      ?? '',
-    ratedPower:           initialData?.ratedPower           ?? '',
+    batteryType:          initialData?.batteryType          ?? '',
+    capacity:             initialData?.capacity             ?? '',
+    voltage:              initialData?.voltage              ?? '',
     warrantyStart:        initialData?.warrantyStart        ?? '',
     warrantyEnd:          initialData?.warrantyEnd          ?? '',
     maintenanceFrequency: initialData?.maintenanceFrequency ?? '',
@@ -78,7 +97,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
     generalNotes:         initialData?.generalNotes         ?? '',
   })
 
-  const set = (key: keyof SolarPanelFormData) =>
+  const set = (key: keyof BatteryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
   const handleSave = () => { onSave({ ...form }); onClose() }
@@ -87,28 +106,28 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
     <Modal
       open
       onClose={onClose}
-      title={initialData ? 'Edit Solar Panel' : 'Add Solar Panel'}
+      title={initialData ? 'Edit Battery' : 'Add Battery'}
       primaryAction={{ content: 'Save', onAction: handleSave, variant: 'primary' }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
     >
-      {/* ── Linked Inverter + Panel Group ───────────────────── */}
+      {/* ── Selected System Type + Choose Linked Inverter ────── */}
       <Modal.Section>
         <div style={grid4}>
           <Select
-            label="Linked Inverter"
+            label="Selected System Type"
+            requiredIndicator
+            options={SYSTEM_TYPE_OPTIONS}
+            value={form.systemType}
+            onChange={set('systemType')}
+          />
+          <Select
+            label="Choose Linked Inverter"
             requiredIndicator
             options={INVERTER_OPTIONS}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
-          />
-          <TextField
-            label="Panel Group"
-            value={form.panelGroup}
-            onChange={set('panelGroup')}
-            placeholder="e.g Group 1"
-            autoComplete="off"
           />
         </div>
       </Modal.Section>
@@ -121,7 +140,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
             <TextField label="Make/Manufacturer" requiredIndicator
               value={form.make} onChange={set('make')}
               placeholder="Enter manufacturer here" autoComplete="off" />
-            <TextField label="Model"
+            <TextField label="Model" requiredIndicator
               value={form.model} onChange={set('model')}
               placeholder="Enter model here" autoComplete="off" />
             <TextField label="Serial Number"
@@ -145,10 +164,20 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
-          <div style={grid4}>
-            <TextField label="Rated Power (W)" requiredIndicator
-              value={form.ratedPower} onChange={set('ratedPower')}
-              placeholder="e.g 400W" autoComplete="off" />
+          <div style={grid3}>
+            <Select
+              label="Type of Battery"
+              requiredIndicator
+              options={BATTERY_TYPE_OPTIONS}
+              value={form.batteryType}
+              onChange={set('batteryType')}
+            />
+            <TextField label="Capacity (kWh)" requiredIndicator
+              value={form.capacity} onChange={set('capacity')}
+              placeholder="e.g 200kWh" autoComplete="off" />
+            <TextField label="Voltage (V)" requiredIndicator
+              value={form.voltage} onChange={set('voltage')}
+              placeholder="e.g 2000v" autoComplete="off" />
           </div>
         </BlockStack>
       </Modal.Section>

@@ -136,6 +136,27 @@ img { display: block; }
   border-radius: 12px !important;
 }
 
+/* Polaris Modal → match Figma 1280px width + 700px max-height with scroll */
+.Polaris-Modal-Dialog__Modal.Polaris-Modal-Dialog--sizeLarge {
+  max-width: 1280px !important;
+}
+
+.Polaris-Modal-Dialog__Modal.Polaris-Modal-Dialog--limitHeight {
+  max-height: 700px !important;
+}
+
+.Polaris-Modal-Dialog__Modal.Polaris-Modal-Dialog--sizeLarge.Polaris-Modal-Dialog--limitHeight {
+  max-height: 700px !important;
+}
+
+/* DateField — hide the native browser calendar picker icon but keep it clickable */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
 /* ── Utility ─────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;

@@ -13,7 +13,7 @@ import {
   type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
-import AddSolarPanelModal, { type SolarPanelFormData } from './AddSolarPanelModal'
+import AddBatteryModal, { type BatteryFormData } from './AddBatteryModal'
 
 const STEPS = [
   { label: 'Facility & Installation Type' },
@@ -24,7 +24,7 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface SolarPanel extends SolarPanelFormData {
+interface Battery extends BatteryFormData {
   id: string
   name: string
 }
@@ -43,38 +43,38 @@ interface Props {
   onBack: () => void
 }
 
-export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
-  const [panels, setPanels]       = useState<SolarPanel[]>([])
-  const [showModal, setShowModal] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
+export default function Step4AddBatteries({ onNext, onBack }: Props) {
+  const [batteries, setBatteries]   = useState<Battery[]>([])
+  const [showModal, setShowModal]   = useState(false)
+  const [editingId, setEditingId]   = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(panels)
+    useIndexResourceState(batteries)
 
-  const totalPages   = Math.ceil(panels.length / PAGE_SIZE)
-  const paginated    = panels.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-  const editingPanel = editingId ? panels.find(p => p.id === editingId) : undefined
+  const totalPages     = Math.ceil(batteries.length / PAGE_SIZE)
+  const paginated      = batteries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const editingBattery = editingId ? batteries.find(b => b.id === editingId) : undefined
 
-  const handleSave = (data: SolarPanelFormData) => {
+  const handleSave = (data: BatteryFormData) => {
     if (editingId !== null) {
-      setPanels(prev => prev.map(p =>
-        p.id === editingId ? { ...p, ...data } : p
+      setBatteries(prev => prev.map(b =>
+        b.id === editingId ? { ...b, ...data } : b
       ))
     } else {
       const newId = String(Date.now())
-      setPanels(prev => [...prev, {
+      setBatteries(prev => [...prev, {
         ...data,
         id:   newId,
-        name: `Panel ${prev.length + 1}`,
+        name: `Battery ${prev.length + 1}`,
       }])
     }
     setEditingId(null)
   }
 
   const handleDelete = (id: string) => {
-    setPanels(prev => {
-      const next = prev.filter(p => p.id !== id)
+    setBatteries(prev => {
+      const next = prev.filter(b => b.id !== id)
       const newTotalPages = Math.ceil(next.length / PAGE_SIZE)
       if (currentPage > newTotalPages && newTotalPages > 0) setCurrentPage(newTotalPages)
       return next
@@ -90,7 +90,8 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
     { title: 'Linked Inverter' },
     { title: 'Make' },
     { title: 'Model' },
-    { title: 'Rated Power (W)' },
+    { title: 'Battery Type' },
+    { title: 'Capacity (kWh)' },
     { title: 'Quantity' },
     { title: 'Equipment Status' },
     { title: '' },
@@ -99,24 +100,24 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
   return (
     <>
       <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-        <StepIndicator steps={STEPS} currentStep={3} completedSteps={[1, 2]} />
+        <StepIndicator steps={STEPS} currentStep={4} completedSteps={[1, 2, 3]} />
 
         <div style={{ padding: 24 }}>
           <BlockStack gap="400">
             {/* Section header */}
             <InlineStack gap="300" blockAlign="center">
-              <Text variant="headingSm" as="h2">Solar Panels</Text>
+              <Text variant="headingSm" as="h2">Battery</Text>
               <Button
                 size="slim"
                 onClick={() => { setEditingId(null); setShowModal(true) }}
               >
-                Add Solar Panel
+                Add Battery
               </Button>
             </InlineStack>
 
             {/* Table */}
             <Card padding="0">
-              {panels.length === 0 ? (
+              {batteries.length === 0 ? (
                 <div style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
                   justifyContent: 'center', gap: 8, padding: '80px 24px',
@@ -127,39 +128,40 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
                     style={{ width: 100, height: 100, objectFit: 'contain' }}
                   />
                   <Text as="p" variant="bodyMd" tone="subdued">No data available for your equipments</Text>
-                  <Button onClick={() => { setEditingId(null); setShowModal(true) }}>Add Solar Panel</Button>
+                  <Button onClick={() => { setEditingId(null); setShowModal(true) }}>Add Battery</Button>
                 </div>
               ) : (
                 <IndexTable
-                  resourceName={{ singular: 'solar panel', plural: 'solar panels' }}
-                  itemCount={panels.length}
+                  resourceName={{ singular: 'battery', plural: 'batteries' }}
+                  itemCount={batteries.length}
                   selectedItemsCount={allResourcesSelected ? 'All' : selectedResources.length}
                   onSelectionChange={handleSelectionChange}
                   headings={headings}
                 >
-                  {paginated.map((panel, index) => (
+                  {paginated.map((battery, index) => (
                     <IndexTable.Row
-                      id={panel.id}
-                      key={panel.id}
-                      selected={selectedResources.includes(panel.id)}
+                      id={battery.id}
+                      key={battery.id}
+                      selected={selectedResources.includes(battery.id)}
                       position={index}
                     >
                       <IndexTable.Cell>
-                        <Text as="span" fontWeight="medium">{panel.linkedInverter || '—'}</Text>
+                        <Text as="span" fontWeight="medium">{battery.linkedInverter || '—'}</Text>
                       </IndexTable.Cell>
-                      <IndexTable.Cell>{panel.make || '—'}</IndexTable.Cell>
-                      <IndexTable.Cell>{panel.model || '—'}</IndexTable.Cell>
-                      <IndexTable.Cell>{panel.ratedPower || '—'}</IndexTable.Cell>
-                      <IndexTable.Cell>{panel.quantity}</IndexTable.Cell>
+                      <IndexTable.Cell>{battery.make || '—'}</IndexTable.Cell>
+                      <IndexTable.Cell>{battery.model || '—'}</IndexTable.Cell>
+                      <IndexTable.Cell>{battery.batteryType || '—'}</IndexTable.Cell>
+                      <IndexTable.Cell>{battery.capacity || '—'}</IndexTable.Cell>
+                      <IndexTable.Cell>{battery.quantity}</IndexTable.Cell>
                       <IndexTable.Cell>
-                        <Badge tone={STATUS_TONES[panel.equipmentStatus] ?? 'info'}>
-                          {panel.equipmentStatus || '—'}
+                        <Badge tone={STATUS_TONES[battery.equipmentStatus] ?? 'info'}>
+                          {battery.equipmentStatus || '—'}
                         </Badge>
                       </IndexTable.Cell>
                       <IndexTable.Cell>
                         <InlineStack gap="300">
-                          <Button variant="plain" onClick={() => handleEdit(panel.id)}>Edit</Button>
-                          <Button variant="plain" tone="critical" onClick={() => handleDelete(panel.id)}>Delete</Button>
+                          <Button variant="plain" onClick={() => handleEdit(battery.id)}>Edit</Button>
+                          <Button variant="plain" tone="critical" onClick={() => handleDelete(battery.id)}>Delete</Button>
                         </InlineStack>
                       </IndexTable.Cell>
                     </IndexTable.Row>
@@ -194,7 +196,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
           <Button onClick={onBack}>Back</Button>
           <Button
             variant="primary"
-            disabled={panels.length === 0}
+            disabled={batteries.length === 0}
             onClick={onNext}
           >
             Next
@@ -203,10 +205,10 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
       </div>
 
       {showModal && (
-        <AddSolarPanelModal
+        <AddBatteryModal
           onClose={() => { setShowModal(false); setEditingId(null) }}
           onSave={handleSave}
-          initialData={editingPanel}
+          initialData={editingBattery}
         />
       )}
     </>

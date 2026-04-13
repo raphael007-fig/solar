@@ -13,7 +13,7 @@ import {
   type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
-import AddInverterModal from './AddInverterModal'
+import AddInverterModal, { type InverterFormData } from './AddInverterModal'
 
 const STEPS = [
   { label: 'Facility & Installation Type' },
@@ -24,15 +24,11 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface Inverter {
+interface Inverter extends InverterFormData {
   id: string
   name: string
-  make: string
-  model: string
   integratedBattery: string
-  capacity: string
   status: string
-  lastMaintenance: string
 }
 
 const STATUS_TONES: Record<string, BadgeTone> = {
@@ -42,51 +38,59 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   'Decommissioned':    'attention',
 }
 
+const PAGE_SIZE = 10
+
 interface Props {
   onNext: () => void
   onBack: () => void
 }
 
 export default function Step2AddInverter({ onNext, onBack }: Props) {
-  const [inverters, setInverters]   = useState<Inverter[]>([])
-  const [showModal, setShowModal]   = useState(false)
-  const [editingId, setEditingId]   = useState<string | null>(null)
+  const [inverters, setInverters] = useState<Inverter[]>([])
+  const [showModal, setShowModal] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(inverters)
 
-  const handleSave = (data: Record<string, unknown>) => {
+  const totalPages   = Math.ceil(inverters.length / PAGE_SIZE)
+  const paginated    = inverters.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const editingInverter = editingId ? inverters.find(inv => inv.id === editingId) : undefined
+
+  const handleSave = (data: InverterFormData) => {
     if (editingId !== null) {
       setInverters(prev => prev.map(inv =>
         inv.id === editingId
           ? {
               ...inv,
-              make:              String(data.make ?? inv.make),
-              model:             String(data.model ?? inv.model),
-              integratedBattery: (data.hasIntegratedBattery as boolean) ? 'Yes' : 'No',
-              capacity:          String(data.capacity ?? inv.capacity),
-              status:            String(data.equipmentStatus ?? inv.status),
+              ...data,
+              integratedBattery: data.hasIntegratedBattery ? 'Yes' : 'No',
+              status: data.equipmentStatus || inv.status,
             }
           : inv
       ))
     } else {
-      const newId = String(inverters.length + 1)
+      const newId = String(Date.now())
       setInverters(prev => [...prev, {
+        ...data,
         id:                newId,
-        name:              `Inv ${newId}`,
-        make:              String(data.make ?? 'Unknown'),
-        model:             String(data.model ?? 'Unknown'),
-        integratedBattery: (data.hasIntegratedBattery as boolean) ? 'Yes' : 'No',
-        capacity:          String(data.capacity ?? '—'),
-        status:            String(data.equipmentStatus ?? 'Functional'),
-        lastMaintenance:   String(data.lastMaintenance ?? '—'),
+        name:              `Inv ${prev.length + 1}`,
+        integratedBattery: data.hasIntegratedBattery ? 'Yes' : 'No',
+        status:            data.equipmentStatus || 'Functional',
       }])
     }
     setEditingId(null)
   }
 
   const handleDelete = (id: string) => {
-    setInverters(prev => prev.filter(inv => inv.id !== id))
+    setInverters(prev => {
+      const next = prev.filter(inv => inv.id !== id)
+      // Adjust page if current page becomes empty
+      const newTotalPages = Math.ceil(next.length / PAGE_SIZE)
+      if (currentPage > newTotalPages && newTotalPages > 0) setCurrentPage(newTotalPages)
+      return next
+    })
   }
 
   const handleEdit = (id: string) => {
@@ -146,7 +150,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
                   onSelectionChange={handleSelectionChange}
                   headings={headings}
                 >
-                  {inverters.map((inv, index) => (
+                  {paginated.map((inv, index) => (
                     <IndexTable.Row
                       id={inv.id}
                       key={inv.id}
@@ -163,7 +167,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
                       <IndexTable.Cell>
                         <Badge tone={STATUS_TONES[inv.status] ?? 'info'}>{inv.status}</Badge>
                       </IndexTable.Cell>
-                      <IndexTable.Cell>{inv.lastMaintenance}</IndexTable.Cell>
+                      <IndexTable.Cell>{inv.lastMaintenance || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>
                         <InlineStack gap="300">
                           <Button variant="plain" onClick={() => handleEdit(inv.id)}>Edit</Button>
@@ -179,10 +183,10 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
               <Box padding="300" borderBlockStartWidth="025" borderColor="border">
                 <InlineStack align="center">
                   <Pagination
-                    hasPrevious={false}
-                    hasNext={false}
-                    onPrevious={() => {}}
-                    onNext={() => {}}
+                    hasPrevious={currentPage > 1}
+                    hasNext={currentPage < totalPages}
+                    onPrevious={() => setCurrentPage(p => p - 1)}
+                    onNext={() => setCurrentPage(p => p + 1)}
                   />
                 </InlineStack>
               </Box>
@@ -214,6 +218,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
         <AddInverterModal
           onClose={() => { setShowModal(false); setEditingId(null) }}
           onSave={handleSave}
+          initialData={editingInverter}
         />
       )}
     </>
