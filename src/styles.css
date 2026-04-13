@@ -1,0 +1,146 @@
+/* ── Design Tokens ──────────────────────────────────── */
+:root {
+  /* Colors */
+  --color-bg: #f1f1f1;
+  --color-surface: #ffffff;
+  --color-border: #e3e3e3;
+  --color-border-input: #8a8a8a;
+  --color-input-bg: #fdfdfd;
+
+  --color-text: #303030;
+  --color-text-secondary: #616161;
+  --color-text-disabled: #b5b5b5;
+  --color-text-emphasis: #005bd3;
+  --color-text-error: #8e1f0b;
+
+  --color-brand: #40ba5b;
+  --color-brand-dark: #1e6e3a;
+
+  --color-btn-primary: #005bd3;
+  --color-btn-primary-hover: #0047a7;
+  --color-btn-primary-disabled: rgba(0,0,0,0.17);
+
+  --color-divider: #e5e7eb;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading-md: 650 14px/20px var(--font-family);
+  --font-heading-sm: 650 13px/20px var(--font-family);
+  --font-body-md: 450 13px/20px var(--font-family);
+  --font-body-md-medium: 550 13px/20px var(--font-family);
+  --font-body-md-semibold: 650 13px/20px var(--font-family);
+  --font-body-sm: 450 12px/16px var(--font-family);
+  --font-body-sm-medium: 550 12px/16px var(--font-family);
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-1-5: 6px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-btn: inset 0 -1px 0 #b5b5b5, inset -1px 0 0 #e3e3e3,
+    inset 1px 0 0 #e3e3e3, inset 0 1px 0 #e3e3e3;
+  --shadow-topbar: 0 1px 0 rgba(26,26,26,0.07);
+}
+
+/* ── Reset ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  font: var(--font-body-md);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font: inherit; }
+a { color: inherit; text-decoration: none; }
+img { display: block; }
+
+/* ── Polaris overrides ───────────────────────────────── */
+
+/* Default (white) button — match Figma inset bevel shadow exactly */
+.Polaris-Button:not(.Polaris-Button--variantPrimary):not(.Polaris-Button--variantPlain):not(.Polaris-Button--variantTertiary):not(.Polaris-Button--toneCritical) {
+  background: #ffffff !important;
+  color: #303030 !important;
+  box-shadow: inset 0 -1px 0 #b5b5b5,
+              inset -1px 0 0 #e3e3e3,
+              inset 1px 0 0 #e3e3e3,
+              inset 0 1px 0 #e3e3e3 !important;
+  border: none !important;
+}
+
+/* Primary button → brand blue */
+.Polaris-Button--variantPrimary {
+  --p-color-bg-fill-emphasis: #005bd3 !important;
+  background: #005bd3 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.17), inset -1px 0 0 rgba(0,0,0,0.07),
+              inset 1px 0 0 rgba(0,0,0,0.07), inset 0 1px 0 rgba(0,0,0,0.07) !important;
+}
+
+.Polaris-Button--variantPrimary:not([aria-disabled='true']):hover {
+  background: #0047a7 !important;
+}
+
+.Polaris-Button--variantPrimary[aria-disabled='true'],
+.Polaris-Button--variantPrimary:disabled {
+  background: rgba(0,0,0,0.17) !important;
+  color: rgba(0,0,0,0.35) !important;
+}
+
+/* EmptyState action button → white, not primary blue */
+.Polaris-EmptyState .Polaris-Button--variantPrimary {
+  background: #ffffff !important;
+  color: #303030 !important;
+  box-shadow: inset 0 -1px 0 #b5b5b5,
+              inset -1px 0 0 #e3e3e3,
+              inset 1px 0 0 #e3e3e3,
+              inset 0 1px 0 #e3e3e3 !important;
+}
+
+.Polaris-EmptyState .Polaris-Button--variantPrimary:hover {
+  background: #f6f6f6 !important;
+}
+
+/* EmptyState illustration — constrain to compact 100px like Figma */
+.Polaris-EmptyState__Image {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: contain !important;
+  margin: 0 auto !important;
+}
+
+.Polaris-EmptyState__ImageContainer {
+  max-width: 100px !important;
+  margin: 0 auto !important;
+}
+
+/* Polaris Card → clean white card */
+.Polaris-ShadowBevel {
+  --pc-shadow-bevel-content-xs: none !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05) !important;
+  border-radius: 12px !important;
+}
+
+/* ── Utility ─────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
