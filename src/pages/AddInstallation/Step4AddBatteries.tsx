@@ -10,7 +10,6 @@ import {
   Card,
   BlockStack,
   Badge,
-  type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import AddBatteryModal, { type BatteryFormData } from './AddBatteryModal'
@@ -29,7 +28,7 @@ interface Battery extends BatteryFormData {
   name: string
 }
 
-const STATUS_TONES: Record<string, BadgeTone> = {
+const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attention'> = {
   'Functional':        'success',
   'Faulty':            'critical',
   'Under Maintenance': 'warning',
@@ -50,7 +49,7 @@ export default function Step4AddBatteries({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(batteries)
+    useIndexResourceState(batteries as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages     = Math.ceil(batteries.length / PAGE_SIZE)
   const paginated      = batteries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -86,7 +85,7 @@ export default function Step4AddBatteries({ onNext, onBack }: Props) {
     setShowModal(true)
   }
 
-  const headings: { title: string }[] = [
+  const headings: [{ title: string }, ...{ title: string }[]] = [
     { title: 'Linked Inverter' },
     { title: 'Make' },
     { title: 'Model' },
@@ -154,7 +153,7 @@ export default function Step4AddBatteries({ onNext, onBack }: Props) {
                       <IndexTable.Cell>{battery.capacity || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>{battery.quantity}</IndexTable.Cell>
                       <IndexTable.Cell>
-                        <Badge tone={STATUS_TONES[battery.equipmentStatus] ?? 'info'}>
+                        <Badge tone={STATUS_TONES[battery.equipmentStatus] ?? ('info' as const)}>
                           {battery.equipmentStatus || '—'}
                         </Badge>
                       </IndexTable.Cell>

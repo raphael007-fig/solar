@@ -10,7 +10,6 @@ import {
   Card,
   BlockStack,
   Badge,
-  type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import AddSolarPanelModal, { type SolarPanelFormData } from './AddSolarPanelModal'
@@ -29,7 +28,7 @@ interface SolarPanel extends SolarPanelFormData {
   name: string
 }
 
-const STATUS_TONES: Record<string, BadgeTone> = {
+const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attention'> = {
   'Functional':        'success',
   'Faulty':            'critical',
   'Under Maintenance': 'warning',
@@ -50,7 +49,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(panels)
+    useIndexResourceState(panels as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages   = Math.ceil(panels.length / PAGE_SIZE)
   const paginated    = panels.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -86,7 +85,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
     setShowModal(true)
   }
 
-  const headings: { title: string }[] = [
+  const headings: [{ title: string }, ...{ title: string }[]] = [
     { title: 'Linked Inverter' },
     { title: 'Make' },
     { title: 'Model' },
@@ -152,7 +151,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
                       <IndexTable.Cell>{panel.ratedPower || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>{panel.quantity}</IndexTable.Cell>
                       <IndexTable.Cell>
-                        <Badge tone={STATUS_TONES[panel.equipmentStatus] ?? 'info'}>
+                        <Badge tone={STATUS_TONES[panel.equipmentStatus] ?? ('info' as const)}>
                           {panel.equipmentStatus || '—'}
                         </Badge>
                       </IndexTable.Cell>

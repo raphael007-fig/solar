@@ -7,7 +7,6 @@ import {
   Text,
   Divider,
   Button,
-  InlineStack,
   BlockStack,
 } from '@shopify/polaris'
 import DateField from '../../components/DateField'
@@ -61,9 +60,17 @@ const MAINTENANCE_FREQ_OPTIONS = [
   { label: 'Annually',      value: 'Annually' },
 ]
 
-// Shared grid styles — keeps every section on the same column rhythm
 const grid4: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }
 const grid3: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
+
+function UploadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
+    </svg>
+  )
+}
 
 export default function AddInverterModal({ onClose, onSave, initialData }: Props) {
   const [form, setForm] = useState<InverterFormData>({
@@ -96,7 +103,7 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       open
       onClose={onClose}
       title={initialData ? 'Edit Inverter' : 'Add Inverter'}
-      primaryAction={{ content: 'Save', onAction: handleSave, variant: 'primary' }}
+      primaryAction={{ content: 'Save', onAction: handleSave }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
@@ -118,7 +125,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Basic Information</Text>
-          {/* 4-column grid — Equipment Status wraps naturally to col 1 of row 2 */}
           <div style={grid4}>
             <TextField label="Make/Manufacturer" requiredIndicator
               value={form.make} onChange={set('make')}
@@ -131,7 +137,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
               placeholder="Enter serial number here" autoComplete="off" />
             <TextField label="Quantity" type="number"
               value={form.quantity} onChange={set('quantity')} autoComplete="off" />
-            {/* Row 2 — aligns under Make/Manufacturer */}
             <Select
               label="Equipment Status"
               requiredIndicator
@@ -147,7 +152,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
-          {/* 3-column grid — checkbox spans all cols, Battery wraps to col 1 of row 3 */}
           <div style={grid3}>
             <TextField label="Rated Power (Watts)" requiredIndicator
               value={form.ratedPower} onChange={set('ratedPower')}
@@ -158,7 +162,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
             <TextField label="Capacity (kWh)" requiredIndicator
               value={form.capacity} onChange={set('capacity')}
               placeholder="e.g 200kWh" autoComplete="off" />
-            {/* Checkbox spans full width */}
             <div style={{ gridColumn: '1 / -1' }}>
               <Checkbox
                 label="Has Integrated Battery?"
@@ -166,7 +169,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
                 onChange={set('hasIntegratedBattery')}
               />
             </div>
-            {/* Internal Battery — aligns under Rated Power */}
             <TextField
               label="Internal Battery Capacity (kWh)"
               value={form.batteryCapacity}
@@ -183,7 +185,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Warranty</Text>
-          {/* 4-col grid — 2 date fields sit in cols 1-2 (same width as system type above) */}
           <div style={grid4}>
             <DateField label="Warranty Start Date"
               value={form.warrantyStart} onChange={set('warrantyStart')} />
@@ -197,7 +198,6 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Maintenance</Text>
-          {/* 3-col grid — fills full width, same rhythm as Specifications above */}
           <div style={grid3}>
             <Select
               label="Maintenance Frequency"
@@ -225,45 +225,26 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       {/* ── Installation + Uploads + Notes ───────────────────── */}
       <Modal.Section>
         <BlockStack gap="500">
-          {/* Installation Date — 4-col grid, aligns with System Type */}
           <div style={grid4}>
             <DateField label="Installation Date" requiredIndicator
               value={form.installationDate} onChange={set('installationDate')} />
           </div>
 
-          {/* Uploads — 3-col grid, each button fills 1 col */}
           <div style={grid3}>
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Installation Report</Text>
-              <Button>
-                <InlineStack gap="100" blockAlign="center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-                  </svg>
-                  Add file
-                </InlineStack>
-              </Button>
+              <Button icon={UploadIcon}>Add file</Button>
               <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
             </BlockStack>
 
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
-              <Button>
-                <InlineStack gap="100" blockAlign="center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-                  </svg>
-                  Add file
-                </InlineStack>
-              </Button>
+              <Button icon={UploadIcon}>Add file</Button>
               <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
             </BlockStack>
           </div>
 
-          {/* General Notes — spans 2 of 3 columns */}
-          <div style={{ ...grid3 }}>
+          <div style={grid3}>
             <div style={{ gridColumn: 'span 2' }}>
               <TextField
                 label="General Notes"

@@ -6,7 +6,6 @@ import {
   Text,
   Divider,
   Button,
-  InlineStack,
   BlockStack,
 } from '@shopify/polaris'
 import DateField from '../../components/DateField'
@@ -60,6 +59,15 @@ const MAINTENANCE_FREQ_OPTIONS = [
 const grid4: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }
 const grid3: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
 
+function UploadIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 export default function AddSolarPanelModal({ onClose, onSave, initialData }: Props) {
   const [form, setForm] = useState<SolarPanelFormData>({
     linkedInverter:       initialData?.linkedInverter       ?? '',
@@ -88,7 +96,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
       open
       onClose={onClose}
       title={initialData ? 'Edit Solar Panel' : 'Add Solar Panel'}
-      primaryAction={{ content: 'Save', onAction: handleSave, variant: 'primary' }}
+      primaryAction={{ content: 'Save', onAction: handleSave }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
@@ -129,7 +137,6 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
               placeholder="Enter serial number here" autoComplete="off" />
             <TextField label="Quantity" type="number"
               value={form.quantity} onChange={set('quantity')} autoComplete="off" />
-            {/* Row 2 */}
             <Select
               label="Equipment Status"
               requiredIndicator
@@ -205,29 +212,13 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
           <div style={grid3}>
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Installation Report</Text>
-              <Button>
-                <InlineStack gap="100" blockAlign="center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-                  </svg>
-                  Add file
-                </InlineStack>
-              </Button>
+              <Button icon={UploadIcon}>Add file</Button>
               <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
             </BlockStack>
 
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
-              <Button>
-                <InlineStack gap="100" blockAlign="center">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 1v8M4 4l3-3 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-                  </svg>
-                  Add file
-                </InlineStack>
-              </Button>
+              <Button icon={UploadIcon}>Add file</Button>
               <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
             </BlockStack>
           </div>

@@ -12,8 +12,6 @@ import {
   BlockStack,
   Text,
   useBreakpoints,
-  type BadgeTone,
-  type TabProps,
 } from '@shopify/polaris'
 import AppShell from '../components/AppShell'
 
@@ -68,7 +66,7 @@ const COMPONENT_DATA: InstallationComponent[] = [
   { id: 'DCM-2024-010', facility: 'Malindi',       systemType: 'Off-Grid',  equipmentType: 'Solar Panel', manufacturer: 'B-Medical Systems', quantity: 53, status: 'Unknown',           lastMaintenance: 'Sep 10, 2024', icon: '❄️' },
 ]
 
-const BADGE_TONES: Record<EquipmentStatus, BadgeTone> = {
+const BADGE_TONES: Record<EquipmentStatus, 'success' | 'info' | 'critical' | 'warning' | 'attention'> = {
   'Active':            'success',
   'Unknown':           'info',
   'Decommissioned':    'attention',
@@ -156,19 +154,19 @@ export default function SolarEquipmentsList() {
     selectedResources: summarySelected,
     allResourcesSelected: summaryAllSelected,
     handleSelectionChange: summarySelectionChange,
-  } = useIndexResourceState(summaryData)
+  } = useIndexResourceState(summaryData as Array<{ id: string } & Record<string, unknown>>)
 
   const {
     selectedResources: componentSelected,
     allResourcesSelected: componentAllSelected,
     handleSelectionChange: componentSelectionChange,
-  } = useIndexResourceState(componentData)
+  } = useIndexResourceState(componentData as Array<{ id: string } & Record<string, unknown>>)
 
   /* ── Tabs ───────────────────────────────────────────── */
 
-  const tabs: TabProps[] = [
-    { id: 'summary-0',   content: 'Summary',        index: 0, onAction: () => {}, isLocked: true, actions: [] },
-    { id: 'component-1', content: 'Component View', index: 1, onAction: () => {}, isLocked: true, actions: [] },
+  const tabs = [
+    { id: 'summary-0',   content: 'Summary',        onAction: () => {}, isLocked: true, actions: [] },
+    { id: 'component-1', content: 'Component View', onAction: () => {}, isLocked: true, actions: [] },
   ]
 
   /* ── Stats ──────────────────────────────────────────── */
@@ -177,16 +175,16 @@ export default function SolarEquipmentsList() {
 
   const stats = isEmpty
     ? [
-        { label: 'Total Installations', value: 0, badge: '0 High Priority',    tone: 'attention' as BadgeTone },
-        { label: 'Off-Grid',            value: 0, badge: '+0 from last week',  tone: 'success' as BadgeTone },
-        { label: 'Hybrid',              value: 0, badge: '0 from last week',   tone: 'info' as BadgeTone },
-        { label: 'Grid-Tied',           value: 0, badge: '+0 from last week',  tone: 'success' as BadgeTone },
+        { label: 'Total Installations', value: 0, badge: '0 High Priority',    tone: 'attention' as const },
+        { label: 'Off-Grid',            value: 0, badge: '+0 from last week',  tone: 'success' as const },
+        { label: 'Hybrid',              value: 0, badge: '0 from last week',   tone: 'info' as const },
+        { label: 'Grid-Tied',           value: 0, badge: '+0 from last week',  tone: 'success' as const },
       ]
     : [
-        { label: 'Total Installations', value: SUMMARY_DATA.length,                                                   badge: '4 High Priority',   tone: 'attention' as BadgeTone },
-        { label: 'Off-Grid',            value: SUMMARY_DATA.filter(d => d.systemType === 'Off-Grid').length,           badge: '+2 from last week', tone: 'success' as BadgeTone },
-        { label: 'Hybrid',              value: SUMMARY_DATA.filter(d => d.systemType === 'Hybrid').length,             badge: '0 from last week',  tone: 'info' as BadgeTone },
-        { label: 'Grid-Tied',           value: SUMMARY_DATA.filter(d => d.systemType === 'Grid Tied').length,          badge: '+2 from last week', tone: 'success' as BadgeTone },
+        { label: 'Total Installations', value: SUMMARY_DATA.length,                                                   badge: '4 High Priority',   tone: 'attention' as const },
+        { label: 'Off-Grid',            value: SUMMARY_DATA.filter(d => d.systemType === 'Off-Grid').length,           badge: '+2 from last week', tone: 'success' as const },
+        { label: 'Hybrid',              value: SUMMARY_DATA.filter(d => d.systemType === 'Hybrid').length,             badge: '0 from last week',  tone: 'info' as const },
+        { label: 'Grid-Tied',           value: SUMMARY_DATA.filter(d => d.systemType === 'Grid Tied').length,          badge: '+2 from last week', tone: 'success' as const },
       ]
 
   /* ── Bulk actions ───────────────────────────────────── */

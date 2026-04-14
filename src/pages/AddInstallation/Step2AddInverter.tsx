@@ -10,7 +10,6 @@ import {
   Card,
   BlockStack,
   Badge,
-  type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import AddInverterModal, { type InverterFormData } from './AddInverterModal'
@@ -31,7 +30,7 @@ interface Inverter extends InverterFormData {
   status: string
 }
 
-const STATUS_TONES: Record<string, BadgeTone> = {
+const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attention'> = {
   'Functional':        'success',
   'Faulty':            'critical',
   'Under Maintenance': 'warning',
@@ -52,7 +51,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(inverters)
+    useIndexResourceState(inverters as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages   = Math.ceil(inverters.length / PAGE_SIZE)
   const paginated    = inverters.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -98,7 +97,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
     setShowModal(true)
   }
 
-  const headings: { title: string }[] = [
+  const headings: [{ title: string }, ...{ title: string }[]] = [
     { title: 'Inverter' },
     { title: 'Make' },
     { title: 'Model' },
@@ -165,7 +164,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
                       <IndexTable.Cell>{inv.integratedBattery}</IndexTable.Cell>
                       <IndexTable.Cell>{inv.capacity}</IndexTable.Cell>
                       <IndexTable.Cell>
-                        <Badge tone={STATUS_TONES[inv.status] ?? 'info'}>{inv.status}</Badge>
+                        <Badge tone={STATUS_TONES[inv.status] ?? ('info' as const)}>{inv.status}</Badge>
                       </IndexTable.Cell>
                       <IndexTable.Cell>{inv.lastMaintenance || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>

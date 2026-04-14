@@ -10,7 +10,6 @@ import {
   Card,
   BlockStack,
   Badge,
-  type BadgeTone,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import AddAccessoryModal, { type AccessoryFormData } from './AddAccessoryModal'
@@ -29,7 +28,7 @@ interface Accessory extends AccessoryFormData {
   name: string
 }
 
-const STATUS_TONES: Record<string, BadgeTone> = {
+const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attention'> = {
   'Functional':        'success',
   'Faulty':            'critical',
   'Under Maintenance': 'warning',
@@ -50,7 +49,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(accessories)
+    useIndexResourceState(accessories as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages      = Math.ceil(accessories.length / PAGE_SIZE)
   const paginated       = accessories.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
@@ -86,7 +85,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
     setShowModal(true)
   }
 
-  const headings: { title: string }[] = [
+  const headings: [{ title: string }, ...{ title: string }[]] = [
     { title: 'Linked Inverter' },
     { title: 'Make' },
     { title: 'Model' },
@@ -152,7 +151,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
                       <IndexTable.Cell>{accessory.accessoryType || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>{accessory.quantity}</IndexTable.Cell>
                       <IndexTable.Cell>
-                        <Badge tone={STATUS_TONES[accessory.equipmentStatus] ?? 'info'}>
+                        <Badge tone={STATUS_TONES[accessory.equipmentStatus] ?? ('info' as const)}>
                           {accessory.equipmentStatus || '—'}
                         </Badge>
                       </IndexTable.Cell>
