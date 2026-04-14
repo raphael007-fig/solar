@@ -5,6 +5,7 @@ import Step1FacilityType from './Step1FacilityType'
 import Step2AddInverter from './Step2AddInverter'
 import Step3AddSolarPanels from './Step3AddSolarPanels'
 import Step4AddBatteries from './Step4AddBatteries'
+import Step5AddAccessories from './Step5AddAccessories'
 
 export default function AddInstallation() {
   const navigate = useNavigate()
@@ -60,8 +61,14 @@ export default function AddInstallation() {
       )}
       {step === 4 && (
         <Step4AddBatteries
-          onNext={handleComplete}
+          onNext={() => setStep(5)}
           onBack={() => setStep(3)}
+        />
+      )}
+      {step === 5 && (
+        <Step5AddAccessories
+          onNext={handleComplete}
+          onBack={() => setStep(4)}
         />
       )}
     </AppShell>
