@@ -129,13 +129,14 @@ interface AccordionItemProps {
 
 function AccordionItem({ name, fields, expanded, onToggle }: AccordionItemProps) {
   return (
-    <div style={{ borderBottom: '1px solid var(--color-border)' }}>
+    <div style={{ borderBottom: '1px solid var(--color-border-subdued, #e1e3e5)' }}>
       <button
         onClick={onToggle}
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          width: '100%', padding: '12px 0',
-          background: 'none', border: 'none', cursor: 'pointer',
+          width: '100%', padding: '12px 16px',
+          background: expanded ? '#fafafa' : 'none',
+          border: 'none', cursor: 'pointer',
           font: 'var(--font-body-md-semibold)',
           color: 'var(--color-text)', textAlign: 'left',
         }}
@@ -147,16 +148,17 @@ function AccordionItem({ name, fields, expanded, onToggle }: AccordionItemProps)
       {expanded && (
         <div style={{
           display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '8px 24px', padding: '4px 24px 20px',
+          gap: '12px 24px', padding: '12px 24px 20px',
+          background: '#fafafa',
         }}>
           {fields.map((f, i) => (
             <div key={i}>
-              <span style={{ font: 'var(--font-body-sm-medium)', color: 'var(--color-text)' }}>
-                {f.label}:{' '}
-              </span>
-              <span style={{ font: 'var(--font-body-sm)', color: 'var(--color-text-secondary)' }}>
-                {f.value}
-              </span>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#6d7175', marginBottom: 2 }}>
+                {f.label}
+              </div>
+              <div style={{ fontSize: 13, color: '#202223' }}>
+                {f.value || '—'}
+              </div>
             </div>
           ))}
         </div>
@@ -343,16 +345,23 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
       <div style={{ padding: 24 }}>
         <BlockStack gap="500">
           {/* Installation Type summary */}
-          <BlockStack gap="100">
+          <BlockStack gap="200">
             <Text variant="headingSm" as="h3">Installation Type</Text>
-            <Text as="p" variant="bodyMd">
-              <strong>Facility:</strong> {step1Data.facility || '—'}
-            </Text>
-            {step1Data.systemTypes.map((st, i) => (
-              <Text key={i} as="p" variant="bodyMd">
-                <strong>System Type {i + 1}:</strong> {st}
-              </Text>
-            ))}
+            <div style={{
+              border: '1px solid var(--color-border)',
+              borderRadius: 8,
+              padding: '14px 20px',
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px 24px',
+            }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#6d7175', marginBottom: 2 }}>Facility</div>
+                <div style={{ fontSize: 13, color: '#202223' }}>{step1Data.facility || '—'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: '#6d7175', marginBottom: 2 }}>System Type(s)</div>
+                <div style={{ fontSize: 13, color: '#202223' }}>{step1Data.systemTypes.join(', ') || '—'}</div>
+              </div>
+            </div>
           </BlockStack>
 
           <Divider />
@@ -362,16 +371,33 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
             <Text as="p" tone="subdued" variant="bodyMd">No equipment added.</Text>
           ) : (
             sections.map(section => (
-              <BlockStack key={section.label} gap="0">
-                {section.items.map(item => (
-                  <AccordionItem
-                    key={item.id}
-                    name={item.name}
-                    fields={item.fields}
-                    expanded={expandedIds.has(item.id)}
-                    onToggle={() => toggle(item.id)}
-                  />
-                ))}
+              <BlockStack key={section.label} gap="100">
+                {/* Section heading */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '6px 0',
+                }}>
+                  <Text variant="headingSm" as="h4">{section.label}</Text>
+                  <Text as="span" variant="bodySm" tone="subdued">
+                    {section.items.length} {section.items.length === 1 ? 'item' : 'items'}
+                  </Text>
+                </div>
+
+                {/* Accordion rows */}
+                <div style={{
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 8, overflow: 'hidden',
+                }}>
+                  {section.items.map(item => (
+                    <AccordionItem
+                      key={item.id}
+                      name={item.name}
+                      fields={item.fields}
+                      expanded={expandedIds.has(item.id)}
+                      onToggle={() => toggle(item.id)}
+                    />
+                  ))}
+                </div>
               </BlockStack>
             ))
           )}
