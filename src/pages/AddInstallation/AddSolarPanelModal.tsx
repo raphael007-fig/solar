@@ -4,15 +4,14 @@ import {
   TextField,
   Select,
   Text,
-  Divider,
   Button,
   BlockStack,
 } from '@shopify/polaris'
 import DateField from '../../components/DateField'
 
 export interface SolarPanelFormData {
+  systemType: string
   linkedInverter: string
-  panelGroup: string
   make: string
   model: string
   serialNumber: string
@@ -22,6 +21,7 @@ export interface SolarPanelFormData {
   warrantyStart: string
   warrantyEnd: string
   maintenanceFrequency: string
+  nextMaintenance: string
   lastMaintenance: string
   installationDate: string
   generalNotes: string
@@ -33,29 +33,37 @@ interface Props {
   initialData?: Partial<SolarPanelFormData>
 }
 
+const SYSTEM_TYPE_OPTIONS = [
+  { label: 'Select', value: '' },
+  { label: 'Off-Grid',  value: 'Off-Grid' },
+  { label: 'Hybrid',    value: 'Hybrid' },
+  { label: 'Grid Tied', value: 'Grid Tied' },
+]
+
 const INVERTER_OPTIONS = [
-  { label: 'Choose', value: '' },
-  { label: 'Inv 1', value: 'Inv 1' },
-  { label: 'Inv 2', value: 'Inv 2' },
-  { label: 'Inv 3', value: 'Inv 3' },
+  { label: 'Select', value: '' },
+  { label: 'Inv 1',  value: 'Inv 1' },
+  { label: 'Inv 2',  value: 'Inv 2' },
+  { label: 'Inv 3',  value: 'Inv 3' },
 ]
 
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
-  { label: 'Functional',        value: 'Functional' },
-  { label: 'Faulty',            value: 'Faulty' },
-  { label: 'Under Maintenance', value: 'Under Maintenance' },
-  { label: 'Decommissioned',    value: 'Decommissioned' },
+  { label: 'Functional',         value: 'Functional' },
+  { label: 'Faulty',             value: 'Faulty' },
+  { label: 'Under Maintenance',  value: 'Under Maintenance' },
+  { label: 'Decommissioned',     value: 'Decommissioned' },
 ]
 
 const MAINTENANCE_FREQ_OPTIONS = [
-  { label: 'Choose maintenance frequency here', value: '' },
+  { label: 'Select maintenance frequency here', value: '' },
   { label: 'Monthly',       value: 'Monthly' },
   { label: 'Quarterly',     value: 'Quarterly' },
   { label: 'Semi-annually', value: 'Semi-annually' },
   { label: 'Annually',      value: 'Annually' },
 ]
 
+const grid2: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }
 const grid4: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }
 const grid3: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
 
@@ -70,8 +78,8 @@ function UploadIcon() {
 
 export default function AddSolarPanelModal({ onClose, onSave, initialData }: Props) {
   const [form, setForm] = useState<SolarPanelFormData>({
+    systemType:           initialData?.systemType           ?? '',
     linkedInverter:       initialData?.linkedInverter       ?? '',
-    panelGroup:           initialData?.panelGroup           ?? '',
     make:                 initialData?.make                 ?? '',
     model:                initialData?.model                ?? '',
     serialNumber:         initialData?.serialNumber         ?? '',
@@ -81,6 +89,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
     warrantyStart:        initialData?.warrantyStart        ?? '',
     warrantyEnd:          initialData?.warrantyEnd          ?? '',
     maintenanceFrequency: initialData?.maintenanceFrequency ?? '',
+    nextMaintenance:      initialData?.nextMaintenance      ?? '',
     lastMaintenance:      initialData?.lastMaintenance      ?? '',
     installationDate:     initialData?.installationDate     ?? '',
     generalNotes:         initialData?.generalNotes         ?? '',
@@ -101,22 +110,22 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
       size="large"
       limitHeight
     >
-      {/* ── Linked Inverter + Panel Group ───────────────────── */}
+      {/* ── Selected System Type + Choose Linked Inverter ───── */}
       <Modal.Section>
-        <div style={grid4}>
+        <div style={grid2}>
           <Select
-            label="Linked Inverter"
+            label="Selected System Type"
+            requiredIndicator
+            options={SYSTEM_TYPE_OPTIONS}
+            value={form.systemType}
+            onChange={set('systemType')}
+          />
+          <Select
+            label="Choose Linked Inverter"
             requiredIndicator
             options={INVERTER_OPTIONS}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
-          />
-          <TextField
-            label="Panel Group"
-            value={form.panelGroup}
-            onChange={set('panelGroup')}
-            placeholder="e.g Group 1"
-            autoComplete="off"
           />
         </div>
       </Modal.Section>
@@ -126,17 +135,39 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Basic Information</Text>
           <div style={grid4}>
-            <TextField label="Make/Manufacturer" requiredIndicator
-              value={form.make} onChange={set('make')}
-              placeholder="Enter manufacturer here" autoComplete="off" />
-            <TextField label="Model"
-              value={form.model} onChange={set('model')}
-              placeholder="Enter model here" autoComplete="off" />
-            <TextField label="Serial Number"
-              value={form.serialNumber} onChange={set('serialNumber')}
-              placeholder="Enter serial number here" autoComplete="off" />
-            <TextField label="Quantity" type="number"
-              value={form.quantity} onChange={set('quantity')} autoComplete="off" />
+            <TextField
+              label="Make/Manufacturer"
+              requiredIndicator
+              value={form.make}
+              onChange={set('make')}
+              placeholder="Enter manufacturer here"
+              autoComplete="off"
+            />
+            <TextField
+              label="Model"
+              requiredIndicator
+              value={form.model}
+              onChange={set('model')}
+              placeholder="Enter model here"
+              autoComplete="off"
+            />
+            <TextField
+              label="Serial Number"
+              value={form.serialNumber}
+              onChange={set('serialNumber')}
+              placeholder="Enter serial number here"
+              autoComplete="off"
+            />
+            <TextField
+              label="Quantity"
+              type="number"
+              value={form.quantity}
+              onChange={set('quantity')}
+              placeholder="0"
+              autoComplete="off"
+            />
+          </div>
+          <div style={grid4}>
             <Select
               label="Equipment Status"
               requiredIndicator
@@ -153,9 +184,14 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid4}>
-            <TextField label="Rated Power (W)" requiredIndicator
-              value={form.ratedPower} onChange={set('ratedPower')}
-              placeholder="e.g 400W" autoComplete="off" />
+            <TextField
+              label="Rated Power (Watts)"
+              requiredIndicator
+              value={form.ratedPower}
+              onChange={set('ratedPower')}
+              placeholder="e.g 2000W"
+              autoComplete="off"
+            />
           </div>
         </BlockStack>
       </Modal.Section>
@@ -165,10 +201,16 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Warranty</Text>
           <div style={grid4}>
-            <DateField label="Warranty Start Date"
-              value={form.warrantyStart} onChange={set('warrantyStart')} />
-            <DateField label="Warranty End Date"
-              value={form.warrantyEnd} onChange={set('warrantyEnd')} />
+            <DateField
+              label="Warranty Start Date"
+              value={form.warrantyStart}
+              onChange={set('warrantyStart')}
+            />
+            <DateField
+              label="Warranty End Date"
+              value={form.warrantyEnd}
+              onChange={set('warrantyEnd')}
+            />
           </div>
         </BlockStack>
       </Modal.Section>
@@ -186,40 +228,47 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
             />
             <DateField
               label="Next Maintenance Date"
-              value=""
-              onChange={() => {}}
+              value={form.nextMaintenance}
+              onChange={set('nextMaintenance')}
               helpText="This is calculated based on the maintenance frequency"
               disabled
             />
-            <DateField label="Last Maintenance Date"
-              value={form.lastMaintenance} onChange={set('lastMaintenance')} />
+            <DateField
+              label="Last Maintenance Date"
+              value={form.lastMaintenance}
+              onChange={set('lastMaintenance')}
+            />
           </div>
         </BlockStack>
       </Modal.Section>
 
-      <Modal.Section>
-        <Divider />
-      </Modal.Section>
-
-      {/* ── Installation + Uploads + Notes ───────────────────── */}
+      {/* ── Installation Date + Uploads + Notes ──────────────── */}
       <Modal.Section>
         <BlockStack gap="500">
           <div style={grid4}>
-            <DateField label="Installation Date" requiredIndicator
-              value={form.installationDate} onChange={set('installationDate')} />
+            <DateField
+              label="Installation Date"
+              requiredIndicator
+              value={form.installationDate}
+              onChange={set('installationDate')}
+            />
           </div>
 
           <div style={grid3}>
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Installation Report</Text>
               <Button icon={UploadIcon}>Add file</Button>
-              <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
+              <Text tone="subdued" as="p" variant="bodySm">
+                Upload up to 5 files (PDF or DOC), max 10 MB each.
+              </Text>
             </BlockStack>
 
             <BlockStack gap="100">
               <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
               <Button icon={UploadIcon}>Add file</Button>
-              <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
+              <Text tone="subdued" as="p" variant="bodySm">
+                Upload up to 3 images (JPEG, PNG), max 10 MB each.
+              </Text>
             </BlockStack>
           </div>
 

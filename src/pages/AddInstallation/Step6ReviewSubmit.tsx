@@ -43,8 +43,8 @@ function inverterFields(inv: Inverter) {
 
 function panelFields(p: SolarPanel) {
   return [
+    { label: 'System Type',           value: p.systemType || '—' },
     { label: 'Linked Inverter',       value: p.linkedInverter || '—' },
-    { label: 'Panel Group',           value: p.panelGroup || '—' },
     { label: 'Make/Manufacturer',     value: p.make },
     { label: 'Model',                 value: p.model || '—' },
     { label: 'Serial Number',         value: p.serialNumber || '—' },
@@ -54,6 +54,7 @@ function panelFields(p: SolarPanel) {
     { label: 'Warranty Start',        value: p.warrantyStart || '—' },
     { label: 'Warranty End',          value: p.warrantyEnd || '—' },
     { label: 'Maintenance Frequency', value: p.maintenanceFrequency || '—' },
+    { label: 'Next Maintenance',      value: p.nextMaintenance || '—' },
     { label: 'Last Maintenance',      value: p.lastMaintenance || '—' },
     { label: 'Installation Date',     value: p.installationDate || '—' },
     { label: 'Notes',                 value: p.generalNotes || '—' },
