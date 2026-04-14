@@ -6,6 +6,7 @@ import Step2AddInverter from './Step2AddInverter'
 import Step3AddSolarPanels from './Step3AddSolarPanels'
 import Step4AddBatteries from './Step4AddBatteries'
 import Step5AddAccessories from './Step5AddAccessories'
+import Step6ReviewSubmit from './Step6ReviewSubmit'
 
 export default function AddInstallation() {
   const navigate = useNavigate()
@@ -67,8 +68,13 @@ export default function AddInstallation() {
       )}
       {step === 5 && (
         <Step5AddAccessories
-          onNext={handleComplete}
+          onNext={() => setStep(6)}
           onBack={() => setStep(4)}
+        />
+      )}
+      {step === 6 && (
+        <Step6ReviewSubmit
+          onBack={() => setStep(5)}
         />
       )}
     </AppShell>
