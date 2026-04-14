@@ -270,9 +270,10 @@ interface Props {
   batteries: Battery[]
   accessories: Accessory[]
   onBack: () => void
+  dashboardPath?: string
 }
 
-export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack }: Props) {
+export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack, dashboardPath }: Props) {
   const navigate = useNavigate()
   const [confirmed, setConfirmed]   = useState(false)
   const [submitted, setSubmitted]   = useState(false)
@@ -320,7 +321,7 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
         systemType={step1Data.systemTypes.join(', ')}
         installationId={installationId}
         onGoHome={() => navigate('/')}
-        onViewDashboard={() => navigate('/prototype-b/dashboard', { state: dashboardState })}
+        onViewDashboard={() => navigate(dashboardPath ?? '/prototype-b/dashboard', { state: dashboardState })}
       />
     )
   }

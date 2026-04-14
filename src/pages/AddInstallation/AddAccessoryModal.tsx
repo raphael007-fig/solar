@@ -22,6 +22,8 @@ export interface AccessoryFormData {
   warrantyStart: string
   warrantyEnd: string
   maintenanceFrequency: string
+  controllerType?: string
+  nextMaintenance?: string
   lastMaintenance: string
   installationDate: string
   generalNotes: string

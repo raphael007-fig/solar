@@ -26,6 +26,7 @@ export interface InverterFormData {
   warrantyStart: string
   warrantyEnd: string
   maintenanceFrequency: string
+  nextMaintenance?: string
   lastMaintenance: string
   installationDate: string
   generalNotes: string

@@ -74,8 +74,9 @@ function EquipmentIcon({ type }: { type: string }) {
 export default function PrototypeBDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
-  const state    = location.state as { installationData?: InstallationData } | null
+  const state    = location.state as { installationData?: InstallationData; returnPath?: string } | null
   const data     = state?.installationData
+  const returnPath = state?.returnPath ?? '/prototype-b'
 
   /* If someone lands here without data (e.g. direct URL), send them back */
   if (!data) {
@@ -86,7 +87,7 @@ export default function PrototypeBDashboard() {
           justifyContent: 'center', gap: 16, minHeight: '60vh',
         }}>
           <Text as="p" tone="subdued" variant="bodyMd">No installation data found.</Text>
-          <Button onClick={() => navigate('/prototype-b')}>Go back to wizard</Button>
+          <Button onClick={() => navigate(returnPath)}>Go back to wizard</Button>
         </div>
       </AppShell>
     )
@@ -182,7 +183,7 @@ export default function PrototypeBDashboard() {
             Installation Dashboard
           </Text>
         </InlineStack>
-        <Button variant="primary" onClick={() => navigate('/prototype-b')}>
+        <Button variant="primary" onClick={() => navigate(returnPath)}>
           Add Another Installation
         </Button>
       </InlineStack>
