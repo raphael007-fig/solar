@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Text, BlockStack } from '@shopify/polaris'
+import { Text, BlockStack } from '@shopify/polaris'
 import AppShell from '../../components/AppShell'
 import Step1FacilityType, { type Step1Data } from '../AddInstallation/Step1FacilityType'
 import Step2Inverters from './Step2Inverters'
