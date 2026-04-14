@@ -14,6 +14,11 @@ import {
   useBreakpoints,
 } from '@shopify/polaris'
 import AppShell from '../components/AppShell'
+import { type Step1Data } from './AddInstallation/Step1FacilityType'
+import { type Inverter } from './AddInstallation/Step2AddInverter'
+import { type SolarPanel } from './AddInstallation/Step3AddSolarPanels'
+import { type Battery } from './AddInstallation/Step4AddBatteries'
+import { type Accessory } from './AddInstallation/Step5AddAccessories'
 
 /* ── Types ─────────────────────────────────────────────── */
 
@@ -40,6 +45,99 @@ interface InstallationComponent {
   status: EquipmentStatus
   lastMaintenance: string
   icon: string
+}
+
+interface InstallationData {
+  step1Data: Step1Data
+  inverters: Inverter[]
+  panels: SolarPanel[]
+  batteries: Battery[]
+  accessories: Accessory[]
+  installationId: string
+}
+
+/* ── Helpers ────────────────────────────────────────────── */
+
+function mapStatus(s: string): EquipmentStatus {
+  if (s === 'Functional') return 'Active'
+  if (s === 'Faulty') return 'Faulty'
+  if (s === 'Under Maintenance') return 'Under Maintenance'
+  if (s === 'Decommissioned') return 'Decommissioned'
+  return 'Unknown'
+}
+
+function buildSummaryRow(data: InstallationData): InstallationSummary {
+  return {
+    id: data.installationId,
+    systemType: data.step1Data.systemTypes[0] || 'N/A',
+    region: 'Kenya',
+    facility: data.step1Data.facility || 'N/A',
+    inverters: data.inverters.length,
+    solarPanels: data.panels.length,
+    batteries: data.batteries.length,
+    accessories: data.accessories.length,
+  }
+}
+
+function buildComponentRows(data: InstallationData): InstallationComponent[] {
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  const facility = data.step1Data.facility || 'N/A'
+  const systemType = data.step1Data.systemTypes[0] || 'N/A'
+  const rows: InstallationComponent[] = []
+
+  data.inverters.forEach((inv, i) => {
+    rows.push({
+      id: `${data.installationId}-INV-${i + 1}`,
+      facility, systemType,
+      equipmentType: 'Inverter',
+      manufacturer: inv.make || '—',
+      quantity: Number(inv.quantity) || 1,
+      status: mapStatus(inv.equipmentStatus),
+      lastMaintenance: inv.lastMaintenance || today,
+      icon: '⚡',
+    })
+  })
+
+  data.panels.forEach((p, i) => {
+    rows.push({
+      id: `${data.installationId}-PNL-${i + 1}`,
+      facility, systemType,
+      equipmentType: 'Solar Panel',
+      manufacturer: p.make || '—',
+      quantity: Number(p.quantity) || 1,
+      status: mapStatus(p.equipmentStatus),
+      lastMaintenance: p.lastMaintenance || today,
+      icon: '☀️',
+    })
+  })
+
+  data.batteries.forEach((b, i) => {
+    rows.push({
+      id: `${data.installationId}-BAT-${i + 1}`,
+      facility, systemType,
+      equipmentType: 'Battery',
+      manufacturer: b.make || '—',
+      quantity: Number(b.quantity) || 1,
+      status: mapStatus(b.equipmentStatus),
+      lastMaintenance: b.lastMaintenance || today,
+      icon: '🔋',
+    })
+  })
+
+  data.accessories.forEach((a, i) => {
+    rows.push({
+      id: `${data.installationId}-ACC-${i + 1}`,
+      facility, systemType,
+      equipmentType: 'Accessory',
+      manufacturer: a.make || '—',
+      quantity: Number(a.quantity) || 1,
+      status: mapStatus(a.equipmentStatus),
+      lastMaintenance: a.lastMaintenance || today,
+      icon: '🔧',
+    })
+  })
+
+  return rows
 }
 
 /* ── Sample data ────────────────────────────────────────── */
@@ -117,36 +215,35 @@ export default function SolarEquipmentsList() {
   const { smDown }   = useBreakpoints()
   const { mode, setMode } = useSetIndexFiltersMode()
 
-  const [hasData, setHasData]         = useState(false)
-  const [activeTab, setActiveTab]     = useState(0)
-  const [queryValue, setQueryValue]   = useState('')
+  const [activeTab, setActiveTab]   = useState(0)
+  const [queryValue, setQueryValue] = useState('')
+  const [addedSummary, setAddedSummary]     = useState<InstallationSummary[]>([])
+  const [addedComponents, setAddedComponents] = useState<InstallationComponent[]>([])
 
-  // Populate list when user completes the Add Installation wizard
+  // When navigating back from the wizard, prepend the real installation data
   useEffect(() => {
-    if ((location.state as { installationAdded?: boolean })?.installationAdded) {
-      setHasData(true)
+    const state = location.state as { installationAdded?: boolean; installationData?: InstallationData } | null
+    if (state?.installationAdded && state.installationData) {
+      setAddedSummary([buildSummaryRow(state.installationData)])
+      setAddedComponents(buildComponentRows(state.installationData))
     }
   }, [location.state])
 
+  const hasData = addedSummary.length > 0 || SUMMARY_DATA.length > 0
+  const allSummary    = [...addedSummary, ...SUMMARY_DATA]
+  const allComponents = [...addedComponents, ...COMPONENT_DATA]
+
   /* ── Filtered data ──────────────────────────────────── */
 
-  const summaryData: InstallationSummary[] = hasData
-    ? SUMMARY_DATA.filter(d =>
-        !queryValue ||
-        Object.values(d).some(v =>
-          String(v).toLowerCase().includes(queryValue.toLowerCase())
-        )
-      )
-    : []
+  const summaryData: InstallationSummary[] = allSummary.filter(d =>
+    !queryValue ||
+    Object.values(d).some(v => String(v).toLowerCase().includes(queryValue.toLowerCase()))
+  )
 
-  const componentData: InstallationComponent[] = hasData
-    ? COMPONENT_DATA.filter(d =>
-        !queryValue ||
-        Object.values(d).some(v =>
-          String(v).toLowerCase().includes(queryValue.toLowerCase())
-        )
-      )
-    : []
+  const componentData: InstallationComponent[] = allComponents.filter(d =>
+    !queryValue ||
+    Object.values(d).some(v => String(v).toLowerCase().includes(queryValue.toLowerCase()))
+  )
 
   /* ── Resource selection ─────────────────────────────── */
 
@@ -171,21 +268,14 @@ export default function SolarEquipmentsList() {
 
   /* ── Stats ──────────────────────────────────────────── */
 
-  const isEmpty = summaryData.length === 0
+  const isEmpty = allSummary.length === 0
 
-  const stats = isEmpty
-    ? [
-        { label: 'Total Installations', value: 0, badge: '0 High Priority',    tone: 'attention' as const },
-        { label: 'Off-Grid',            value: 0, badge: '+0 from last week',  tone: 'success' as const },
-        { label: 'Hybrid',              value: 0, badge: '0 from last week',   tone: 'info' as const },
-        { label: 'Grid-Tied',           value: 0, badge: '+0 from last week',  tone: 'success' as const },
-      ]
-    : [
-        { label: 'Total Installations', value: SUMMARY_DATA.length,                                                   badge: '4 High Priority',   tone: 'attention' as const },
-        { label: 'Off-Grid',            value: SUMMARY_DATA.filter(d => d.systemType === 'Off-Grid').length,           badge: '+2 from last week', tone: 'success' as const },
-        { label: 'Hybrid',              value: SUMMARY_DATA.filter(d => d.systemType === 'Hybrid').length,             badge: '0 from last week',  tone: 'info' as const },
-        { label: 'Grid-Tied',           value: SUMMARY_DATA.filter(d => d.systemType === 'Grid Tied').length,          badge: '+2 from last week', tone: 'success' as const },
-      ]
+  const stats = [
+    { label: 'Total Installations', value: allSummary.length,                                                badge: isEmpty ? '0 High Priority'   : '4 High Priority',   tone: 'attention' as const },
+    { label: 'Off-Grid',            value: allSummary.filter(d => d.systemType === 'Off-Grid').length,       badge: isEmpty ? '+0 from last week' : '+2 from last week', tone: 'success' as const },
+    { label: 'Hybrid',              value: allSummary.filter(d => d.systemType === 'Hybrid').length,         badge: isEmpty ? '0 from last week'  : '0 from last week',  tone: 'info' as const },
+    { label: 'Grid-Tied',           value: allSummary.filter(d => d.systemType === 'Grid Tied').length,      badge: isEmpty ? '+0 from last week' : '+2 from last week', tone: 'success' as const },
+  ]
 
   /* ── Bulk actions ───────────────────────────────────── */
 

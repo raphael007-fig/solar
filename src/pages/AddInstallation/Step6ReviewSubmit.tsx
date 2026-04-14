@@ -187,12 +187,13 @@ function SuccessIcon() {
 interface SuccessPageProps {
   facility: string
   systemType: string
+  installationId: string
   onGoHome: () => void
+  onViewDashboard: () => void
 }
 
-function SuccessPage({ facility, systemType, onGoHome }: SuccessPageProps) {
+function SuccessPage({ facility, systemType, installationId, onGoHome, onViewDashboard }: SuccessPageProps) {
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const installationId = `INST-${String(Date.now()).slice(-5)}`
 
   return (
     <div style={{
@@ -238,6 +239,7 @@ function SuccessPage({ facility, systemType, onGoHome }: SuccessPageProps) {
               </InlineStack>
               <Text as="p" variant="bodyMd" tone="magic">Installation Type: {systemType || 'N/A'}</Text>
               <Text as="p" variant="bodyMd" tone="magic">Date Installed: {today}</Text>
+              <Text as="p" variant="bodyMd" tone="magic">Region: Kenya</Text>
               <Text as="p" variant="bodyMd" tone="magic">Installation ID: {installationId}</Text>
             </BlockStack>
           </div>
@@ -246,8 +248,8 @@ function SuccessPage({ facility, systemType, onGoHome }: SuccessPageProps) {
 
           <InlineStack gap="200">
             <Button variant="primary" onClick={onGoHome}>Add Another Equipment</Button>
-            <Button onClick={onGoHome}>Link Another Accessory</Button>
-            <Button onClick={onGoHome}>View Details</Button>
+            <Button onClick={onViewDashboard}>View Dashboard</Button>
+            <Button onClick={onViewDashboard}>View Details</Button>
           </InlineStack>
         </BlockStack>
       </div>
@@ -271,6 +273,7 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
   const [confirmed, setConfirmed] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [installationId] = useState(() => `INST-${String(Date.now()).slice(-5)}`)
 
   const toggle = (id: string) => {
     setExpandedIds(prev => {
@@ -281,12 +284,19 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
     })
   }
 
+  const navigationState = {
+    installationAdded: true,
+    installationData: { step1Data, inverters, panels, batteries, accessories, installationId },
+  }
+
   if (submitted) {
     return (
       <SuccessPage
         facility={step1Data.facility}
         systemType={step1Data.systemTypes.join(', ')}
-        onGoHome={() => navigate('/')}
+        installationId={installationId}
+        onGoHome={() => navigate('/', { state: navigationState })}
+        onViewDashboard={() => navigate('/', { state: navigationState })}
       />
     )
   }
