@@ -298,8 +298,8 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
         facility={step1Data.facility}
         systemType={step1Data.systemTypes.join(', ')}
         installationId={installationId}
-        onGoHome={() => navigate('/', { state: navigationState })}
-        onViewDashboard={() => navigate('/', { state: navigationState })}
+        onGoHome={() => navigate('/prototype-b', { state: navigationState })}
+        onViewDashboard={() => navigate('/prototype-b', { state: navigationState })}
       />
     )
   }

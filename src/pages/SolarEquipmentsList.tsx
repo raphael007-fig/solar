@@ -296,7 +296,7 @@ export default function SolarEquipmentsList() {
         style={{ width: 100, height: 100, objectFit: 'contain' }}
       />
       <Text as="p" variant="bodyMd" tone="subdued">No data available for your equipments</Text>
-      <Button onClick={() => navigate('/add-installation')}>Add Installation</Button>
+      <Button onClick={() => navigate('/prototype-b/add-installation')}>Add Installation</Button>
     </div>
   )
 
@@ -369,7 +369,15 @@ export default function SolarEquipmentsList() {
     <AppShell>
       {/* Page header */}
       <InlineStack align="space-between" blockAlign="center" wrap={false}>
-        <InlineStack gap="100" blockAlign="center">
+        <InlineStack gap="300" blockAlign="center">
+          <button
+            onClick={() => navigate('/')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', gap: 4, color: '#616161' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 4L6 8l4 4" stroke="#616161" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
           <Text as="h1" variant="headingLg" fontWeight="semibold">Solar Equipments</Text>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M4 6l4 4 4-4" stroke="#616161" strokeWidth="1.5" strokeLinecap="round"/>
@@ -383,7 +391,7 @@ export default function SolarEquipmentsList() {
               <Button>Decommission Equipment</Button>
             </>
           )}
-          <Button variant="primary" size="large" onClick={() => navigate('/add-installation')}>
+          <Button variant="primary" size="large" onClick={() => navigate('/prototype-b/add-installation')}>
             Add Installation
           </Button>
         </InlineStack>
