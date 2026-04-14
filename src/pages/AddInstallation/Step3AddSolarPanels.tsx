@@ -12,6 +12,7 @@ import {
   Badge,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
+import { type InverterSelectOption } from '../../components/InverterSelect'
 import AddSolarPanelModal, { type SolarPanelFormData } from './AddSolarPanelModal'
 
 const STEPS = [
@@ -39,14 +40,14 @@ const PAGE_SIZE = 10
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: SolarPanel[]
   onNext: (panels: SolarPanel[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step3AddSolarPanels({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step3AddSolarPanels({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const [panels, setPanels]       = useState<SolarPanel[]>(() => initialData ?? [])
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -211,7 +212,7 @@ export default function Step3AddSolarPanels({ systemTypes, inverterNames, initia
           onSave={handleSave}
           initialData={editingPanel}
           systemTypes={systemTypes}
-          inverterNames={inverterNames}
+          inverterOptions={inverterOptions}
         />
       )}
     </>

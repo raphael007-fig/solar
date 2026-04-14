@@ -12,6 +12,7 @@ import {
   Badge,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
+import { type InverterSelectOption } from '../../components/InverterSelect'
 import AddBatteryModal, { type BatteryFormData } from './AddBatteryModal'
 
 const STEPS = [
@@ -39,14 +40,14 @@ const PAGE_SIZE = 10
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: Battery[]
   onNext: (batteries: Battery[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step4AddBatteries({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step4AddBatteries({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const [batteries, setBatteries]   = useState<Battery[]>(() => initialData ?? [])
   const [showModal, setShowModal]   = useState(false)
   const [editingId, setEditingId]   = useState<string | null>(null)
@@ -213,7 +214,7 @@ export default function Step4AddBatteries({ systemTypes, inverterNames, initialD
           onSave={handleSave}
           initialData={editingBattery}
           systemTypes={systemTypes}
-          inverterNames={inverterNames}
+          inverterOptions={inverterOptions}
         />
       )}
     </>

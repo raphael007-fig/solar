@@ -8,6 +8,7 @@ import {
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import DateField from '../../components/DateField'
+import InverterSelect, { type InverterSelectOption } from '../../components/InverterSelect'
 import { type AccessoryFormData } from '../AddInstallation/AddAccessoryModal'
 import { type Accessory } from '../AddInstallation/Step5AddAccessories'
 
@@ -99,7 +100,7 @@ function emptyEntry(id: string): AccessoryEntry {
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: Accessory[]
   onNext: (accessories: Accessory[]) => void
   onBack: () => void
@@ -110,15 +111,12 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step5Accessories({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step5Accessories({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
-    ...systemTypes.map(t => ({ label: t, value: t })),
+    ...systemTypes.map((t, i) => ({ label: `System Type ${i + 1}: ${t}`, value: t })),
   ]
-  const inverterOptions = [
-    { label: 'Select', value: '' },
-    ...inverterNames.map(n => ({ label: n, value: n })),
-  ]
+
   const [entries, setEntries] = useState<AccessoryEntry[]>(() =>
     initialData && initialData.length > 0
       ? initialData.map(a => ({ ...a, expanded: false }))
@@ -201,7 +199,7 @@ export default function Step5Accessories({ systemTypes, inverterNames, initialDa
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
-                    <Select
+                    <InverterSelect
                       label={req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}

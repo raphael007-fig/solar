@@ -8,6 +8,7 @@ import {
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import DateField from '../../components/DateField'
+import InverterSelect, { type InverterSelectOption } from '../../components/InverterSelect'
 import { type SolarPanelFormData } from '../AddInstallation/AddSolarPanelModal'
 import { type SolarPanel } from '../AddInstallation/Step3AddSolarPanels'
 
@@ -81,7 +82,7 @@ function emptyEntry(id: string): PanelEntry {
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: SolarPanel[]
   onNext: (panels: SolarPanel[]) => void
   onBack: () => void
@@ -92,15 +93,12 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step3SolarPanels({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step3SolarPanels({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
-    ...systemTypes.map(t => ({ label: t, value: t })),
+    ...systemTypes.map((t, i) => ({ label: `System Type ${i + 1}: ${t}`, value: t })),
   ]
-  const inverterOptions = [
-    { label: 'Select', value: '' },
-    ...inverterNames.map(n => ({ label: n, value: n })),
-  ]
+
   const [entries, setEntries] = useState<PanelEntry[]>(() =>
     initialData && initialData.length > 0
       ? initialData.map(p => ({ ...p, expanded: false }))
@@ -183,7 +181,7 @@ export default function Step3SolarPanels({ systemTypes, inverterNames, initialDa
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
-                    <Select
+                    <InverterSelect
                       label={req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}

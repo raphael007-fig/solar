@@ -50,6 +50,7 @@ export default function PrototypeAWizard() {
       {/* Step rendering */}
       {step === 1 && (
         <Step1FacilityType
+          initialData={step1Data}
           onNext={data => { setStep1Data(data); setStep(2) }}
           onBack={() => navigate('/')}
           onStepClick={setStep}
@@ -69,7 +70,7 @@ export default function PrototypeAWizard() {
       {step === 3 && (
         <Step3SolarPanels
           systemTypes={step1Data.systemTypes}
-          inverterNames={inverters.map(inv => inv.name)}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1 }))}
           initialData={panels}
           onNext={data => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
@@ -80,7 +81,7 @@ export default function PrototypeAWizard() {
       {step === 4 && (
         <Step4Batteries
           systemTypes={step1Data.systemTypes}
-          inverterNames={inverters.map(inv => inv.name)}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1 }))}
           initialData={batteries}
           onNext={data => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
@@ -91,7 +92,7 @@ export default function PrototypeAWizard() {
       {step === 5 && (
         <Step5Accessories
           systemTypes={step1Data.systemTypes}
-          inverterNames={inverters.map(inv => inv.name)}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1 }))}
           initialData={accessories}
           onNext={data => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}

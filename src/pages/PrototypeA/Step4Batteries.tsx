@@ -8,6 +8,7 @@ import {
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
 import DateField from '../../components/DateField'
+import InverterSelect, { type InverterSelectOption } from '../../components/InverterSelect'
 import { type BatteryFormData } from '../AddInstallation/AddBatteryModal'
 import { type Battery } from '../AddInstallation/Step4AddBatteries'
 
@@ -91,7 +92,7 @@ function emptyEntry(id: string): BatteryEntry {
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: Battery[]
   onNext: (batteries: Battery[]) => void
   onBack: () => void
@@ -102,15 +103,12 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step4Batteries({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step4Batteries({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
-    ...systemTypes.map(t => ({ label: t, value: t })),
+    ...systemTypes.map((t, i) => ({ label: `System Type ${i + 1}: ${t}`, value: t })),
   ]
-  const inverterOptions = [
-    { label: 'Select', value: '' },
-    ...inverterNames.map(n => ({ label: n, value: n })),
-  ]
+
   const [entries, setEntries] = useState<BatteryEntry[]>(() =>
     initialData && initialData.length > 0
       ? initialData.map(b => ({ ...b, expanded: false }))
@@ -193,7 +191,7 @@ export default function Step4Batteries({ systemTypes, inverterNames, initialData
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
-                    <Select
+                    <InverterSelect
                       label={req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}

@@ -75,6 +75,7 @@ export interface Step1Data {
 }
 
 interface Props {
+  initialData?: Step1Data
   onNext: (data: Step1Data) => void
   onBack: () => void
   onStepClick?: (step: number) => void
@@ -178,10 +179,14 @@ function SystemTypePopover({
 }
 
 /* ── Main component ───────────────────────────────────── */
-export default function Step1FacilityType({ onNext, onBack, onStepClick }: Props) {
-  const [facility, setFacility] = useState('')
+export default function Step1FacilityType({ initialData, onNext, onBack, onStepClick }: Props) {
+  const [facility, setFacility] = useState(initialData?.facility ?? '')
 
-  const [systemTypes, setSystemTypes] = useState<SystemTypeEntry[]>([{ id: 1, value: '' }])
+  const [systemTypes, setSystemTypes] = useState<SystemTypeEntry[]>(() =>
+    initialData?.systemTypes && initialData.systemTypes.length > 0
+      ? initialData.systemTypes.map((value, i) => ({ id: i + 1, value }))
+      : [{ id: 1, value: '' }]
+  )
   const [openSystemDropdown, setOpenSystemDropdown] = useState<{ id: number; rect: DropdownRect } | null>(null)
   const systemTriggerRefs = useRef<Map<number, HTMLDivElement>>(new Map())
 

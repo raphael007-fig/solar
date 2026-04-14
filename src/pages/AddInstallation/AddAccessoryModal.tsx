@@ -9,6 +9,7 @@ import {
   BlockStack,
 } from '@shopify/polaris'
 import DateField from '../../components/DateField'
+import InverterSelect, { type InverterSelectOption } from '../../components/InverterSelect'
 
 export interface AccessoryFormData {
   systemType: string
@@ -34,7 +35,7 @@ interface Props {
   onSave: (data: AccessoryFormData) => void
   initialData?: Partial<AccessoryFormData>
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
 }
 
 const EQUIPMENT_STATUS_OPTIONS = [
@@ -79,14 +80,10 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function AddAccessoryModal({ onClose, onSave, initialData, systemTypes, inverterNames }: Props) {
+export default function AddAccessoryModal({ onClose, onSave, initialData, systemTypes, inverterOptions }: Props) {
   const systemTypeOptions = [
     { label: 'Select', value: '' },
-    ...systemTypes.map(t => ({ label: t, value: t })),
-  ]
-  const inverterOptions = [
-    { label: 'Select', value: '' },
-    ...inverterNames.map(n => ({ label: n, value: n })),
+    ...systemTypes.map((t, i) => ({ label: `System Type ${i + 1}: ${t}`, value: t })),
   ]
   const [form, setForm] = useState<AccessoryFormData>({
     systemType:           initialData?.systemType           ?? '',
@@ -131,7 +128,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData, system
             value={form.systemType}
             onChange={set('systemType')}
           />
-          <Select
+          <InverterSelect
             label={req("Choose Linked Inverter")}
             options={inverterOptions}
             value={form.linkedInverter}

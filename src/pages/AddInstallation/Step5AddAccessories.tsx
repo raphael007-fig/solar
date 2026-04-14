@@ -12,6 +12,7 @@ import {
   Badge,
 } from '@shopify/polaris'
 import StepIndicator from '../../components/StepIndicator'
+import { type InverterSelectOption } from '../../components/InverterSelect'
 import AddAccessoryModal, { type AccessoryFormData } from './AddAccessoryModal'
 
 const STEPS = [
@@ -39,14 +40,14 @@ const PAGE_SIZE = 10
 
 interface Props {
   systemTypes: string[]
-  inverterNames: string[]
+  inverterOptions: InverterSelectOption[]
   initialData?: Accessory[]
   onNext: (accessories: Accessory[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step5AddAccessories({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+export default function Step5AddAccessories({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const [accessories, setAccessories] = useState<Accessory[]>(() => initialData ?? [])
   const [showModal, setShowModal]     = useState(false)
   const [editingId, setEditingId]     = useState<string | null>(null)
@@ -211,7 +212,7 @@ export default function Step5AddAccessories({ systemTypes, inverterNames, initia
           onSave={handleSave}
           initialData={editingAccessory}
           systemTypes={systemTypes}
-          inverterNames={inverterNames}
+          inverterOptions={inverterOptions}
         />
       )}
     </>
