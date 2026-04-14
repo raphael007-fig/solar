@@ -309,6 +309,10 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
     }
   }
 
+  const dashboardState = {
+    installationData: { installationId, step1Data, inverters, panels, batteries, accessories },
+  }
+
   if (submitted) {
     return (
       <SuccessPage
@@ -316,7 +320,7 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
         systemType={step1Data.systemTypes.join(', ')}
         installationId={installationId}
         onGoHome={() => navigate('/')}
-        onViewDashboard={() => navigate('/')}
+        onViewDashboard={() => navigate('/prototype-b/dashboard', { state: dashboardState })}
       />
     )
   }
