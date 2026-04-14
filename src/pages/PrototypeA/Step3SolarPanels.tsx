@@ -106,7 +106,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
   }
 
   const toggle = (id: string) => {
-    setEntries(prev => prev.map(e => e.id === id ? { ...e, expanded: !e.expanded } : e))
+    setEntries(prev => prev.map(e => ({ ...e, expanded: e.id === id ? !e.expanded : false })))
   }
 
   const remove = (id: string) => {
@@ -114,7 +114,10 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
   }
 
   const addAnother = () => {
-    setEntries(prev => [...prev, emptyEntry(String(Date.now()))])
+    setEntries(prev => [
+      ...prev.map(e => ({ ...e, expanded: false })),
+      emptyEntry(String(Date.now())),
+    ])
   }
 
   const handleNext = () => {
