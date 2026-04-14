@@ -38,15 +38,16 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: (panels: SolarPanel[]) => void
-  onBack: () => void
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: SolarPanel[]
+  onNext: (panels: SolarPanel[]) => void
+  onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step3AddSolarPanels({ onNext, onBack, systemTypes, inverterNames, onStepClick }: Props) {
-  const [panels, setPanels]       = useState<SolarPanel[]>([])
+export default function Step3AddSolarPanels({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+  const [panels, setPanels]       = useState<SolarPanel[]>(() => initialData ?? [])
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)

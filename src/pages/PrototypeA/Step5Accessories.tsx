@@ -100,6 +100,7 @@ function emptyEntry(id: string): AccessoryEntry {
 interface Props {
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: Accessory[]
   onNext: (accessories: Accessory[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
@@ -109,7 +110,7 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step5Accessories({ systemTypes, inverterNames, onNext, onBack, onStepClick }: Props) {
+export default function Step5Accessories({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
     ...systemTypes.map(t => ({ label: t, value: t })),
@@ -118,7 +119,11 @@ export default function Step5Accessories({ systemTypes, inverterNames, onNext, o
     { label: 'Select', value: '' },
     ...inverterNames.map(n => ({ label: n, value: n })),
   ]
-  const [entries, setEntries] = useState<AccessoryEntry[]>([emptyEntry(String(Date.now()))])
+  const [entries, setEntries] = useState<AccessoryEntry[]>(() =>
+    initialData && initialData.length > 0
+      ? initialData.map(a => ({ ...a, expanded: false }))
+      : [emptyEntry(String(Date.now()))]
+  )
 
   const canProceed = entries.length > 0 && entries.every(e =>
     e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.accessoryType

@@ -82,6 +82,7 @@ function emptyEntry(id: string): PanelEntry {
 interface Props {
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: SolarPanel[]
   onNext: (panels: SolarPanel[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
@@ -91,7 +92,7 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step3SolarPanels({ systemTypes, inverterNames, onNext, onBack, onStepClick }: Props) {
+export default function Step3SolarPanels({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
     ...systemTypes.map(t => ({ label: t, value: t })),
@@ -100,7 +101,11 @@ export default function Step3SolarPanels({ systemTypes, inverterNames, onNext, o
     { label: 'Select', value: '' },
     ...inverterNames.map(n => ({ label: n, value: n })),
   ]
-  const [entries, setEntries] = useState<PanelEntry[]>([emptyEntry(String(Date.now()))])
+  const [entries, setEntries] = useState<PanelEntry[]>(() =>
+    initialData && initialData.length > 0
+      ? initialData.map(p => ({ ...p, expanded: false }))
+      : [emptyEntry(String(Date.now()))]
+  )
 
   const canProceed = entries.length > 0 && entries.every(e =>
     e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.ratedPower

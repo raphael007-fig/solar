@@ -92,6 +92,7 @@ function emptyEntry(id: string): BatteryEntry {
 interface Props {
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: Battery[]
   onNext: (batteries: Battery[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
@@ -101,7 +102,7 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step4Batteries({ systemTypes, inverterNames, onNext, onBack, onStepClick }: Props) {
+export default function Step4Batteries({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
     ...systemTypes.map(t => ({ label: t, value: t })),
@@ -110,7 +111,11 @@ export default function Step4Batteries({ systemTypes, inverterNames, onNext, onB
     { label: 'Select', value: '' },
     ...inverterNames.map(n => ({ label: n, value: n })),
   ]
-  const [entries, setEntries] = useState<BatteryEntry[]>([emptyEntry(String(Date.now()))])
+  const [entries, setEntries] = useState<BatteryEntry[]>(() =>
+    initialData && initialData.length > 0
+      ? initialData.map(b => ({ ...b, expanded: false }))
+      : [emptyEntry(String(Date.now()))]
+  )
 
   const canProceed = entries.length > 0 && entries.every(e =>
     e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.batteryType && e.voltage && e.capacity

@@ -40,14 +40,15 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
+  systemTypes: string[]
+  initialData?: Inverter[]
   onNext: (inverters: Inverter[]) => void
   onBack: () => void
-  systemTypes: string[]
   onStepClick?: (step: number) => void
 }
 
-export default function Step2AddInverter({ onNext, onBack, systemTypes, onStepClick }: Props) {
-  const [inverters, setInverters] = useState<Inverter[]>([])
+export default function Step2AddInverter({ systemTypes, initialData, onNext, onBack, onStepClick }: Props) {
+  const [inverters, setInverters] = useState<Inverter[]>(() => initialData ?? [])
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)

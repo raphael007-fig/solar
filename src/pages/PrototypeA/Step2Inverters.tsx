@@ -85,6 +85,7 @@ function emptyEntry(id: string): InverterEntry {
 
 interface Props {
   systemTypes: string[]
+  initialData?: Inverter[]
   onNext: (inverters: Inverter[]) => void
   onBack: () => void
   onStepClick?: (step: number) => void
@@ -94,12 +95,16 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
-export default function Step2Inverters({ systemTypes, onNext, onBack, onStepClick }: Props) {
+export default function Step2Inverters({ systemTypes, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
     ...systemTypes.map(t => ({ label: t, value: t })),
   ]
-  const [entries, setEntries] = useState<InverterEntry[]>([emptyEntry(String(Date.now()))])
+  const [entries, setEntries] = useState<InverterEntry[]>(() =>
+    initialData && initialData.length > 0
+      ? initialData.map(inv => ({ ...inv, expanded: false }))
+      : [emptyEntry(String(Date.now()))]
+  )
 
   const canProceed = entries.length > 0 && entries.every(e =>
     e.systemType && e.make && e.equipmentStatus && e.ratedPower && e.voltage && e.capacity

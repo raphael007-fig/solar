@@ -38,15 +38,16 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: (accessories: Accessory[]) => void
-  onBack: () => void
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: Accessory[]
+  onNext: (accessories: Accessory[]) => void
+  onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step5AddAccessories({ onNext, onBack, systemTypes, inverterNames, onStepClick }: Props) {
-  const [accessories, setAccessories] = useState<Accessory[]>([])
+export default function Step5AddAccessories({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+  const [accessories, setAccessories] = useState<Accessory[]>(() => initialData ?? [])
   const [showModal, setShowModal]     = useState(false)
   const [editingId, setEditingId]     = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)

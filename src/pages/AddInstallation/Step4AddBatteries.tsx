@@ -38,15 +38,16 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: (batteries: Battery[]) => void
-  onBack: () => void
   systemTypes: string[]
   inverterNames: string[]
+  initialData?: Battery[]
+  onNext: (batteries: Battery[]) => void
+  onBack: () => void
   onStepClick?: (step: number) => void
 }
 
-export default function Step4AddBatteries({ onNext, onBack, systemTypes, inverterNames, onStepClick }: Props) {
-  const [batteries, setBatteries]   = useState<Battery[]>([])
+export default function Step4AddBatteries({ systemTypes, inverterNames, initialData, onNext, onBack, onStepClick }: Props) {
+  const [batteries, setBatteries]   = useState<Battery[]>(() => initialData ?? [])
   const [showModal, setShowModal]   = useState(false)
   const [editingId, setEditingId]   = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)

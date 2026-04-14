@@ -53,6 +53,7 @@ export default function AddInstallation() {
       {step === 2 && (
         <Step2AddInverter
           systemTypes={step1Data.systemTypes}
+          initialData={inverters}
           onNext={(data) => { setInverters(data); setStep(3) }}
           onBack={() => setStep(1)}
           onStepClick={setStep}
@@ -62,6 +63,7 @@ export default function AddInstallation() {
         <Step3AddSolarPanels
           systemTypes={step1Data.systemTypes}
           inverterNames={inverters.map(inv => inv.name)}
+          initialData={panels}
           onNext={(data) => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
           onStepClick={setStep}
@@ -71,6 +73,7 @@ export default function AddInstallation() {
         <Step4AddBatteries
           systemTypes={step1Data.systemTypes}
           inverterNames={inverters.map(inv => inv.name)}
+          initialData={batteries}
           onNext={(data) => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
           onStepClick={setStep}
@@ -80,6 +83,7 @@ export default function AddInstallation() {
         <Step5AddAccessories
           systemTypes={step1Data.systemTypes}
           inverterNames={inverters.map(inv => inv.name)}
+          initialData={accessories}
           onNext={(data) => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}
           onStepClick={setStep}
