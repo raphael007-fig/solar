@@ -36,14 +36,8 @@ interface Props {
   onClose: () => void
   onSave: (data: InverterFormData) => void
   initialData?: Partial<InverterFormData>
+  systemTypes: string[]
 }
-
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Choose', value: '' },
-  { label: 'Off-Grid',  value: 'Off-Grid' },
-  { label: 'Hybrid',    value: 'Hybrid' },
-  { label: 'Tied-Grid', value: 'Tied-Grid' },
-]
 
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
@@ -73,7 +67,15 @@ function UploadIcon() {
   )
 }
 
-export default function AddInverterModal({ onClose, onSave, initialData }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function AddInverterModal({ onClose, onSave, initialData, systemTypes }: Props) {
+  const systemTypeOptions = [
+    { label: 'Choose', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
   const [form, setForm] = useState<InverterFormData>({
     systemType:           initialData?.systemType           ?? '',
     make:                 initialData?.make                 ?? '',
@@ -97,6 +99,8 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
   const set = (key: keyof InverterFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
+  const canSave = Boolean(form.systemType && form.make && form.equipmentStatus && form.ratedPower && form.voltage && form.capacity)
+
   const handleSave = () => { onSave({ ...form }); onClose() }
 
   return (
@@ -104,7 +108,7 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       open
       onClose={onClose}
       title={initialData ? 'Edit Inverter' : 'Add Inverter'}
-      primaryAction={{ content: 'Save', onAction: handleSave }}
+      primaryAction={{ content: 'Save', onAction: handleSave, disabled: !canSave }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
@@ -113,9 +117,8 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <div style={grid4}>
           <Select
-            label="Selected System Type"
-            requiredIndicator
-            options={SYSTEM_TYPE_OPTIONS}
+            label={req("Selected System Type")}
+            options={systemTypeOptions}
             value={form.systemType}
             onChange={set('systemType')}
           />
@@ -127,7 +130,7 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Basic Information</Text>
           <div style={grid4}>
-            <TextField label="Make/Manufacturer" requiredIndicator
+            <TextField label={req("Make/Manufacturer")}
               value={form.make} onChange={set('make')}
               placeholder="Enter manufacturer here" autoComplete="off" />
             <TextField label="Model"
@@ -139,8 +142,7 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
             <TextField label="Quantity" type="number"
               value={form.quantity} onChange={set('quantity')} autoComplete="off" />
             <Select
-              label="Equipment Status"
-              requiredIndicator
+              label={req("Equipment Status")}
               options={EQUIPMENT_STATUS_OPTIONS}
               value={form.equipmentStatus}
               onChange={set('equipmentStatus')}
@@ -154,13 +156,13 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid3}>
-            <TextField label="Rated Power (Watts)" requiredIndicator
+            <TextField label={req("Rated Power (Watts)")}
               value={form.ratedPower} onChange={set('ratedPower')}
               placeholder="e.g 2000W" autoComplete="off" />
-            <TextField label="Voltage (V)" requiredIndicator
+            <TextField label={req("Voltage (V)")}
               value={form.voltage} onChange={set('voltage')}
               placeholder="e.g 2000v" autoComplete="off" />
-            <TextField label="Capacity (kWh)" requiredIndicator
+            <TextField label={req("Capacity (kWh)")}
               value={form.capacity} onChange={set('capacity')}
               placeholder="e.g 200kWh" autoComplete="off" />
             <div style={{ gridColumn: '1 / -1' }}>
@@ -227,7 +229,7 @@ export default function AddInverterModal({ onClose, onSave, initialData }: Props
       <Modal.Section>
         <BlockStack gap="500">
           <div style={grid4}>
-            <DateField label="Installation Date" requiredIndicator
+            <DateField label="Installation Date"
               value={form.installationDate} onChange={set('installationDate')} />
           </div>
 

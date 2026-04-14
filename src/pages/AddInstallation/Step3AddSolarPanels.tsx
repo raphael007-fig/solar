@@ -40,9 +40,12 @@ const PAGE_SIZE = 10
 interface Props {
   onNext: (panels: SolarPanel[]) => void
   onBack: () => void
+  systemTypes: string[]
+  inverterNames: string[]
+  onStepClick?: (step: number) => void
 }
 
-export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
+export default function Step3AddSolarPanels({ onNext, onBack, systemTypes, inverterNames, onStepClick }: Props) {
   const [panels, setPanels]       = useState<SolarPanel[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -98,7 +101,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
   return (
     <>
       <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-        <StepIndicator steps={STEPS} currentStep={3} completedSteps={[1, 2]} />
+        <StepIndicator steps={STEPS} currentStep={3} completedSteps={[1, 2]} onStepClick={onStepClick} />
 
         <div style={{ padding: 24 }}>
           <BlockStack gap="400">
@@ -206,6 +209,8 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
           onClose={() => { setShowModal(false); setEditingId(null) }}
           onSave={handleSave}
           initialData={editingPanel}
+          systemTypes={systemTypes}
+          inverterNames={inverterNames}
         />
       )}
     </>

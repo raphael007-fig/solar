@@ -20,20 +20,6 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Choose', value: '' },
-  { label: 'Off-Grid', value: 'Off-Grid' },
-  { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'Grid Tied', value: 'Grid Tied' },
-]
-
-const INVERTER_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Inv 1', value: 'Inv 1' },
-  { label: 'Inv 2', value: 'Inv 2' },
-  { label: 'Inv 3', value: 'Inv 3' },
-]
-
 const ACCESSORY_TYPE_OPTIONS = [
   { label: 'Choose accessory type here', value: '' },
   { label: 'Controller', value: 'Controller' },
@@ -112,12 +98,31 @@ function emptyEntry(id: string): AccessoryEntry {
 }
 
 interface Props {
+  systemTypes: string[]
+  inverterNames: string[]
   onNext: (accessories: Accessory[]) => void
   onBack: () => void
+  onStepClick?: (step: number) => void
 }
 
-export default function Step5Accessories({ onNext, onBack }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function Step5Accessories({ systemTypes, inverterNames, onNext, onBack, onStepClick }: Props) {
+  const systemTypeOptions = [
+    { label: 'Choose', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
+  const inverterOptions = [
+    { label: 'Select', value: '' },
+    ...inverterNames.map(n => ({ label: n, value: n })),
+  ]
   const [entries, setEntries] = useState<AccessoryEntry[]>([emptyEntry(String(Date.now()))])
+
+  const canProceed = entries.length > 0 && entries.every(e =>
+    e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.accessoryType
+  )
 
   const update = (id: string, key: keyof AccessoryFormData, value: string | boolean) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, [key]: value } : e))
@@ -148,7 +153,7 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-      <StepIndicator steps={STEPS} currentStep={5} completedSteps={[1, 2, 3, 4]} />
+      <StepIndicator steps={STEPS} currentStep={5} completedSteps={[1, 2, 3, 4]} onStepClick={onStepClick} />
 
       <div style={{ padding: 24 }}>
         {entries.map((entry, idx) => (
@@ -186,19 +191,19 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                   {/* System Type + Linked Inverter + Accessory Type */}
                   <div style={grid3}>
                     <Select
-                      label="Selected System Type"
-                      options={SYSTEM_TYPE_OPTIONS}
+                      label={req('Selected System Type')}
+                      options={systemTypeOptions}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <Select
-                      label="Choose Linked Inverter"
-                      options={INVERTER_OPTIONS}
+                      label={req('Choose Linked Inverter')}
+                      options={inverterOptions}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
                     />
                     <Select
-                      label="Choose Accessory Type"
+                      label={req('Choose Accessory Type')}
                       options={ACCESSORY_TYPE_OPTIONS}
                       value={entry.accessoryType}
                       onChange={v => update(entry.id, 'accessoryType', v)}
@@ -211,7 +216,7 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer"
+                      <TextField label={req('Make/Manufacturer')}
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
                       <TextField label="Model"
@@ -226,7 +231,7 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                     </div>
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
-                        label="Equipment Status"
+                        label={req('Equipment Status')}
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -352,7 +357,7 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
         <Button onClick={onBack}>Back</Button>
         <Button
           variant="primary"
-          disabled={entries.length === 0}
+          disabled={!canProceed}
           onClick={handleNext}
         >
           Next

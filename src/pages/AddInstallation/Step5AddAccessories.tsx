@@ -40,9 +40,12 @@ const PAGE_SIZE = 10
 interface Props {
   onNext: (accessories: Accessory[]) => void
   onBack: () => void
+  systemTypes: string[]
+  inverterNames: string[]
+  onStepClick?: (step: number) => void
 }
 
-export default function Step5AddAccessories({ onNext, onBack }: Props) {
+export default function Step5AddAccessories({ onNext, onBack, systemTypes, inverterNames, onStepClick }: Props) {
   const [accessories, setAccessories] = useState<Accessory[]>([])
   const [showModal, setShowModal]     = useState(false)
   const [editingId, setEditingId]     = useState<string | null>(null)
@@ -98,7 +101,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
   return (
     <>
       <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-        <StepIndicator steps={STEPS} currentStep={5} completedSteps={[1, 2, 3, 4]} />
+        <StepIndicator steps={STEPS} currentStep={5} completedSteps={[1, 2, 3, 4]} onStepClick={onStepClick} />
 
         <div style={{ padding: 24 }}>
           <BlockStack gap="400">
@@ -206,6 +209,8 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
           onClose={() => { setShowModal(false); setEditingId(null) }}
           onSave={handleSave}
           initialData={editingAccessory}
+          systemTypes={systemTypes}
+          inverterNames={inverterNames}
         />
       )}
     </>

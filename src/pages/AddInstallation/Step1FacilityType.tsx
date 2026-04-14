@@ -77,6 +77,7 @@ export interface Step1Data {
 interface Props {
   onNext: (data: Step1Data) => void
   onBack: () => void
+  onStepClick?: (step: number) => void
 }
 
 /* ── Floating System Type popover rendered via portal ─── */
@@ -177,7 +178,7 @@ function SystemTypePopover({
 }
 
 /* ── Main component ───────────────────────────────────── */
-export default function Step1FacilityType({ onNext, onBack }: Props) {
+export default function Step1FacilityType({ onNext, onBack, onStepClick }: Props) {
   const [facility, setFacility] = useState('')
 
   const [systemTypes, setSystemTypes] = useState<SystemTypeEntry[]>([{ id: 1, value: '' }])
@@ -225,7 +226,7 @@ export default function Step1FacilityType({ onNext, onBack }: Props) {
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'hidden' }}>
-      <StepIndicator steps={STEPS} currentStep={1} completedSteps={[]} />
+      <StepIndicator steps={STEPS} currentStep={1} completedSteps={[]} onStepClick={onStepClick} />
 
       <div style={{ padding: 24 }}>
         <BlockStack gap="400">
@@ -309,19 +310,21 @@ export default function Step1FacilityType({ onNext, onBack }: Props) {
               />
             )}
 
-            <div>
-              <Button
-                variant="plain"
-                onClick={addSystemType}
-                icon={
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                }
-              >
-                Add Another Installation Type
-              </Button>
-            </div>
+            {systemTypes.length < 3 && (
+              <div>
+                <Button
+                  variant="plain"
+                  onClick={addSystemType}
+                  icon={
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 2v8M2 6h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  }
+                >
+                  Add Another Installation Type
+                </Button>
+              </div>
+            )}
           </BlockStack>
         </BlockStack>
       </div>

@@ -271,9 +271,10 @@ interface Props {
   accessories: Accessory[]
   onBack: () => void
   dashboardPath?: string
+  onStepClick?: (step: number) => void
 }
 
-export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack, dashboardPath }: Props) {
+export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack, dashboardPath, onStepClick }: Props) {
   const navigate = useNavigate()
   const [confirmed, setConfirmed]   = useState(false)
   const [submitted, setSubmitted]   = useState(false)
@@ -363,7 +364,7 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-      <StepIndicator steps={STEPS} currentStep={6} completedSteps={[1, 2, 3, 4, 5]} />
+      <StepIndicator steps={STEPS} currentStep={6} completedSteps={[1, 2, 3, 4, 5]} onStepClick={onStepClick} />
 
       <div style={{ padding: 24 }}>
         <BlockStack gap="500">

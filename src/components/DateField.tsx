@@ -20,11 +20,14 @@ interface Props {
   onChange: (value: string) => void
   disabled?: boolean
   helpText?: string
-  requiredIndicator?: boolean
 }
 
 export default function DateField({
-  label, value, onChange, disabled, helpText, requiredIndicator,
+  label,
+  value,
+  onChange,
+  disabled,
+  helpText,
 }: Props) {
   return (
     <TextField
@@ -34,7 +37,6 @@ export default function DateField({
       onChange={onChange}
       disabled={disabled}
       helpText={helpText}
-      requiredIndicator={requiredIndicator}
       autoComplete="off"
       prefix={<CalendarIcon />}
     />

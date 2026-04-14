@@ -33,21 +33,9 @@ interface Props {
   onClose: () => void
   onSave: (data: AccessoryFormData) => void
   initialData?: Partial<AccessoryFormData>
+  systemTypes: string[]
+  inverterNames: string[]
 }
-
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Off-Grid',  value: 'Off-Grid' },
-  { label: 'Hybrid',    value: 'Hybrid' },
-  { label: 'Tied-Grid', value: 'Tied-Grid' },
-]
-
-const INVERTER_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Inv 1', value: 'Inv 1' },
-  { label: 'Inv 2', value: 'Inv 2' },
-  { label: 'Inv 3', value: 'Inv 3' },
-]
 
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
@@ -87,7 +75,19 @@ function UploadIcon() {
   )
 }
 
-export default function AddAccessoryModal({ onClose, onSave, initialData }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function AddAccessoryModal({ onClose, onSave, initialData, systemTypes, inverterNames }: Props) {
+  const systemTypeOptions = [
+    { label: 'Select', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
+  const inverterOptions = [
+    { label: 'Select', value: '' },
+    ...inverterNames.map(n => ({ label: n, value: n })),
+  ]
   const [form, setForm] = useState<AccessoryFormData>({
     systemType:           initialData?.systemType           ?? '',
     linkedInverter:       initialData?.linkedInverter       ?? '',
@@ -108,6 +108,8 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
   const set = (key: keyof AccessoryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
+  const canSave = Boolean(form.systemType && form.linkedInverter && form.make && form.equipmentStatus && form.accessoryType)
+
   const handleSave = () => { onSave({ ...form }); onClose() }
 
   return (
@@ -115,7 +117,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
       open
       onClose={onClose}
       title={initialData ? 'Edit Accessory' : 'Add Accessory'}
-      primaryAction={{ content: 'Save', onAction: handleSave }}
+      primaryAction={{ content: 'Save', onAction: handleSave, disabled: !canSave }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
@@ -124,16 +126,14 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
       <Modal.Section>
         <div style={grid4}>
           <Select
-            label="Selected System Type"
-            requiredIndicator
-            options={SYSTEM_TYPE_OPTIONS}
+            label={req("Selected System Type")}
+            options={systemTypeOptions}
             value={form.systemType}
             onChange={set('systemType')}
           />
           <Select
-            label="Choose Linked Inverter"
-            requiredIndicator
-            options={INVERTER_OPTIONS}
+            label={req("Choose Linked Inverter")}
+            options={inverterOptions}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
           />
@@ -145,10 +145,10 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Basic Information</Text>
           <div style={grid4}>
-            <TextField label="Make/Manufacturer" requiredIndicator
+            <TextField label={req("Make/Manufacturer")}
               value={form.make} onChange={set('make')}
               placeholder="Enter manufacturer here" autoComplete="off" />
-            <TextField label="Model" requiredIndicator
+            <TextField label="Model"
               value={form.model} onChange={set('model')}
               placeholder="Enter model here" autoComplete="off" />
             <TextField label="Serial Number"
@@ -157,8 +157,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
             <TextField label="Quantity" type="number"
               value={form.quantity} onChange={set('quantity')} autoComplete="off" />
             <Select
-              label="Equipment Status"
-              requiredIndicator
+              label={req("Equipment Status")}
               options={EQUIPMENT_STATUS_OPTIONS}
               value={form.equipmentStatus}
               onChange={set('equipmentStatus')}
@@ -173,8 +172,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid4}>
             <Select
-              label="Accessory Type"
-              requiredIndicator
+              label={req("Accessory Type")}
               options={ACCESSORY_TYPE_OPTIONS}
               value={form.accessoryType}
               onChange={set('accessoryType')}
@@ -228,7 +226,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
       <Modal.Section>
         <BlockStack gap="500">
           <div style={grid4}>
-            <DateField label="Installation Date" requiredIndicator
+            <DateField label="Installation Date"
               value={form.installationDate} onChange={set('installationDate')} />
           </div>
 

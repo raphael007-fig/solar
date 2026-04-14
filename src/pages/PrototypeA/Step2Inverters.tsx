@@ -21,13 +21,6 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Choose', value: '' },
-  { label: 'Off-Grid', value: 'Off-Grid' },
-  { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'Grid Tied', value: 'Grid Tied' },
-]
-
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
   { label: 'Functional', value: 'Functional' },
@@ -91,12 +84,26 @@ function emptyEntry(id: string): InverterEntry {
 }
 
 interface Props {
+  systemTypes: string[]
   onNext: (inverters: Inverter[]) => void
   onBack: () => void
+  onStepClick?: (step: number) => void
 }
 
-export default function Step2Inverters({ onNext, onBack }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function Step2Inverters({ systemTypes, onNext, onBack, onStepClick }: Props) {
+  const systemTypeOptions = [
+    { label: 'Choose', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
   const [entries, setEntries] = useState<InverterEntry[]>([emptyEntry(String(Date.now()))])
+
+  const canProceed = entries.length > 0 && entries.every(e =>
+    e.systemType && e.make && e.equipmentStatus && e.ratedPower && e.voltage && e.capacity
+  )
 
   const update = (id: string, key: keyof InverterFormData, value: string | boolean) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, [key]: value } : e))
@@ -129,7 +136,7 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-      <StepIndicator steps={STEPS} currentStep={2} completedSteps={[1]} />
+      <StepIndicator steps={STEPS} currentStep={2} completedSteps={[1]} onStepClick={onStepClick} />
 
       <div style={{ padding: 24 }}>
         {entries.map((entry, idx) => (
@@ -167,8 +174,8 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                   {/* System Type */}
                   <div style={{ maxWidth: 240 }}>
                     <Select
-                      label="Selected System Type"
-                      options={SYSTEM_TYPE_OPTIONS}
+                      label={req('Selected System Type')}
+                      options={systemTypeOptions}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
@@ -180,7 +187,7 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer"
+                      <TextField label={req('Make/Manufacturer')}
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
                       <TextField label="Model"
@@ -195,7 +202,7 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                     </div>
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
-                        label="Equipment Status"
+                        label={req('Equipment Status')}
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -209,13 +216,13 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={grid3}>
-                      <TextField label="Rated Power (Watts)"
+                      <TextField label={req('Rated Power (Watts)')}
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
-                      <TextField label="Voltage (V)"
+                      <TextField label={req('Voltage (V)')}
                         value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
                         placeholder="e.g 2000v" autoComplete="off" />
-                      <TextField label="Capacity (kWh)"
+                      <TextField label={req('Capacity (kWh)')}
                         value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
                         placeholder="e.g 200kWh" autoComplete="off" />
                       <div style={{ gridColumn: '1 / -1' }}>
@@ -339,7 +346,7 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
         <Button onClick={onBack}>Back</Button>
         <Button
           variant="primary"
-          disabled={entries.length === 0}
+          disabled={!canProceed}
           onClick={handleNext}
         >
           Next

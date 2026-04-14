@@ -47,30 +47,42 @@ export default function AddInstallation() {
         <Step1FacilityType
           onNext={(data) => { setStep1Data(data); setStep(2) }}
           onBack={() => navigate('/')}
+          onStepClick={setStep}
         />
       )}
       {step === 2 && (
         <Step2AddInverter
+          systemTypes={step1Data.systemTypes}
           onNext={(data) => { setInverters(data); setStep(3) }}
           onBack={() => setStep(1)}
+          onStepClick={setStep}
         />
       )}
       {step === 3 && (
         <Step3AddSolarPanels
+          systemTypes={step1Data.systemTypes}
+          inverterNames={inverters.map(inv => inv.name)}
           onNext={(data) => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
+          onStepClick={setStep}
         />
       )}
       {step === 4 && (
         <Step4AddBatteries
+          systemTypes={step1Data.systemTypes}
+          inverterNames={inverters.map(inv => inv.name)}
           onNext={(data) => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
+          onStepClick={setStep}
         />
       )}
       {step === 5 && (
         <Step5AddAccessories
+          systemTypes={step1Data.systemTypes}
+          inverterNames={inverters.map(inv => inv.name)}
           onNext={(data) => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}
+          onStepClick={setStep}
         />
       )}
       {step === 6 && (
@@ -81,6 +93,7 @@ export default function AddInstallation() {
           batteries={batteries}
           accessories={accessories}
           onBack={() => setStep(5)}
+          onStepClick={setStep}
         />
       )}
     </AppShell>

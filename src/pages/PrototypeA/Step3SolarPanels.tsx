@@ -20,20 +20,6 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Choose', value: '' },
-  { label: 'Off-Grid', value: 'Off-Grid' },
-  { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'Grid Tied', value: 'Grid Tied' },
-]
-
-const INVERTER_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Inv 1', value: 'Inv 1' },
-  { label: 'Inv 2', value: 'Inv 2' },
-  { label: 'Inv 3', value: 'Inv 3' },
-]
-
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
   { label: 'Functional', value: 'Functional' },
@@ -94,12 +80,31 @@ function emptyEntry(id: string): PanelEntry {
 }
 
 interface Props {
+  systemTypes: string[]
+  inverterNames: string[]
   onNext: (panels: SolarPanel[]) => void
   onBack: () => void
+  onStepClick?: (step: number) => void
 }
 
-export default function Step3SolarPanels({ onNext, onBack }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function Step3SolarPanels({ systemTypes, inverterNames, onNext, onBack, onStepClick }: Props) {
+  const systemTypeOptions = [
+    { label: 'Choose', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
+  const inverterOptions = [
+    { label: 'Select', value: '' },
+    ...inverterNames.map(n => ({ label: n, value: n })),
+  ]
   const [entries, setEntries] = useState<PanelEntry[]>([emptyEntry(String(Date.now()))])
+
+  const canProceed = entries.length > 0 && entries.every(e =>
+    e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.ratedPower
+  )
 
   const update = (id: string, key: keyof SolarPanelFormData, value: string | boolean) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, [key]: value } : e))
@@ -130,7 +135,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
-      <StepIndicator steps={STEPS} currentStep={3} completedSteps={[1, 2]} />
+      <StepIndicator steps={STEPS} currentStep={3} completedSteps={[1, 2]} onStepClick={onStepClick} />
 
       <div style={{ padding: 24 }}>
         {entries.map((entry, idx) => (
@@ -168,14 +173,14 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                   {/* System Type + Linked Inverter */}
                   <div style={grid2}>
                     <Select
-                      label="Selected System Type"
-                      options={SYSTEM_TYPE_OPTIONS}
+                      label={req('Selected System Type')}
+                      options={systemTypeOptions}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <Select
-                      label="Choose Linked Inverter"
-                      options={INVERTER_OPTIONS}
+                      label={req('Choose Linked Inverter')}
+                      options={inverterOptions}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
                     />
@@ -187,7 +192,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer"
+                      <TextField label={req('Make/Manufacturer')}
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
                       <TextField label="Model"
@@ -202,7 +207,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                     </div>
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
-                        label="Equipment Status"
+                        label={req('Equipment Status')}
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -216,7 +221,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={{ maxWidth: 240 }}>
-                      <TextField label="Rated Power (Watts)"
+                      <TextField label={req('Rated Power (Watts)')}
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
                     </div>
@@ -325,7 +330,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
         <Button onClick={onBack}>Back</Button>
         <Button
           variant="primary"
-          disabled={entries.length === 0}
+          disabled={!canProceed}
           onClick={handleNext}
         >
           Next

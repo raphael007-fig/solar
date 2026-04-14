@@ -31,21 +31,9 @@ interface Props {
   onClose: () => void
   onSave: (data: SolarPanelFormData) => void
   initialData?: Partial<SolarPanelFormData>
+  systemTypes: string[]
+  inverterNames: string[]
 }
-
-const SYSTEM_TYPE_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Off-Grid',  value: 'Off-Grid' },
-  { label: 'Hybrid',    value: 'Hybrid' },
-  { label: 'Grid Tied', value: 'Grid Tied' },
-]
-
-const INVERTER_OPTIONS = [
-  { label: 'Select', value: '' },
-  { label: 'Inv 1',  value: 'Inv 1' },
-  { label: 'Inv 2',  value: 'Inv 2' },
-  { label: 'Inv 3',  value: 'Inv 3' },
-]
 
 const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Select status here', value: '' },
@@ -76,7 +64,19 @@ function UploadIcon() {
   )
 }
 
-export default function AddSolarPanelModal({ onClose, onSave, initialData }: Props) {
+function req(label: string) {
+  return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
+}
+
+export default function AddSolarPanelModal({ onClose, onSave, initialData, systemTypes, inverterNames }: Props) {
+  const systemTypeOptions = [
+    { label: 'Select', value: '' },
+    ...systemTypes.map(t => ({ label: t, value: t })),
+  ]
+  const inverterOptions = [
+    { label: 'Select', value: '' },
+    ...inverterNames.map(n => ({ label: n, value: n })),
+  ]
   const [form, setForm] = useState<SolarPanelFormData>({
     systemType:           initialData?.systemType           ?? '',
     linkedInverter:       initialData?.linkedInverter       ?? '',
@@ -98,6 +98,8 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
   const set = (key: keyof SolarPanelFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
+  const canSave = Boolean(form.systemType && form.linkedInverter && form.make && form.equipmentStatus && form.ratedPower)
+
   const handleSave = () => { onSave({ ...form }); onClose() }
 
   return (
@@ -105,7 +107,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
       open
       onClose={onClose}
       title={initialData ? 'Edit Solar Panel' : 'Add Solar Panel'}
-      primaryAction={{ content: 'Save', onAction: handleSave }}
+      primaryAction={{ content: 'Save', onAction: handleSave, disabled: !canSave }}
       secondaryActions={[{ content: 'Cancel', onAction: onClose }]}
       size="large"
       limitHeight
@@ -114,16 +116,14 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
       <Modal.Section>
         <div style={grid2}>
           <Select
-            label="Selected System Type"
-            requiredIndicator
-            options={SYSTEM_TYPE_OPTIONS}
+            label={req("Selected System Type")}
+            options={systemTypeOptions}
             value={form.systemType}
             onChange={set('systemType')}
           />
           <Select
-            label="Choose Linked Inverter"
-            requiredIndicator
-            options={INVERTER_OPTIONS}
+            label={req("Choose Linked Inverter")}
+            options={inverterOptions}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
           />
@@ -136,8 +136,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
           <Text variant="headingSm" as="h3">Basic Information</Text>
           <div style={grid4}>
             <TextField
-              label="Make/Manufacturer"
-              requiredIndicator
+              label={req("Make/Manufacturer")}
               value={form.make}
               onChange={set('make')}
               placeholder="Enter manufacturer here"
@@ -145,7 +144,6 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
             />
             <TextField
               label="Model"
-              requiredIndicator
               value={form.model}
               onChange={set('model')}
               placeholder="Enter model here"
@@ -169,8 +167,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
           </div>
           <div style={grid4}>
             <Select
-              label="Equipment Status"
-              requiredIndicator
+              label={req("Equipment Status")}
               options={EQUIPMENT_STATUS_OPTIONS}
               value={form.equipmentStatus}
               onChange={set('equipmentStatus')}
@@ -185,8 +182,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid4}>
             <TextField
-              label="Rated Power (Watts)"
-              requiredIndicator
+              label={req("Rated Power (Watts)")}
               value={form.ratedPower}
               onChange={set('ratedPower')}
               placeholder="e.g 2000W"
@@ -248,7 +244,6 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData }: Pro
           <div style={grid4}>
             <DateField
               label="Installation Date"
-              requiredIndicator
               value={form.installationDate}
               onChange={set('installationDate')}
             />
