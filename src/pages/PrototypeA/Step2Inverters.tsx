@@ -98,7 +98,7 @@ function req(label: string) {
 export default function Step2Inverters({ systemTypes, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
-    ...systemTypes.map(t => ({ label: t, value: t })),
+    ...systemTypes.map((t, i) => ({ label: `System Type ${i + 1}: ${t}`, value: t })),
   ]
   const [entries, setEntries] = useState<InverterEntry[]>(() =>
     initialData && initialData.length > 0

@@ -100,7 +100,7 @@ export default function InverterSelect({ label, value, onChange, options }: Prop
   return (
     <div>
       {/* Label — matches Polaris label style */}
-      <div style={{ marginBottom: 4, fontSize: 14, fontWeight: 450, color: '#202223', lineHeight: '20px' }}>
+      <div style={{ marginBottom: 4, fontSize: 14, fontWeight: 550, color: '#202223', lineHeight: '20px' }}>
         {label}
       </div>
 
@@ -108,13 +108,13 @@ export default function InverterSelect({ label, value, onChange, options }: Prop
       <div
         ref={triggerRef}
         onClick={() => (open ? setOpen(false) : handleOpen())}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = '#8a8a8a')}
-        onMouseLeave={e => (e.currentTarget.style.borderColor = '#c5c5c5')}
+        onMouseEnter={e => (e.currentTarget.style.borderColor = '#616161')}
+        onMouseLeave={e => (e.currentTarget.style.borderColor = '#8a8a8a')}
         style={{
           display: 'flex', alignItems: 'center', gap: 4,
           width: '100%', minHeight: 32,
           padding: '5px 12px',
-          border: '1px solid #c5c5c5', borderRadius: 8,
+          border: '1px solid #8a8a8a', borderRadius: 8,
           background: '#fdfdfd', cursor: 'pointer',
           userSelect: 'none', boxSizing: 'border-box',
         }}
