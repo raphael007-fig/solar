@@ -168,7 +168,6 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                   <div style={{ maxWidth: 240 }}>
                     <Select
                       label="Selected System Type"
-                      requiredIndicator
                       options={SYSTEM_TYPE_OPTIONS}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
@@ -181,10 +180,10 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer" requiredIndicator
+                      <TextField label="Make/Manufacturer"
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
-                      <TextField label="Model" requiredIndicator
+                      <TextField label="Model"
                         value={entry.model} onChange={v => update(entry.id, 'model', v)}
                         placeholder="Enter model here" autoComplete="off" />
                       <TextField label="Serial Number"
@@ -197,7 +196,6 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
                         label="Equipment Status"
-                        requiredIndicator
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -211,13 +209,13 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={grid3}>
-                      <TextField label="Rated Power (Watts)" requiredIndicator
+                      <TextField label="Rated Power (Watts)"
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
-                      <TextField label="Voltage (V)" requiredIndicator
+                      <TextField label="Voltage (V)"
                         value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
                         placeholder="e.g 2000v" autoComplete="off" />
-                      <TextField label="Capacity (kWh)" requiredIndicator
+                      <TextField label="Capacity (kWh)"
                         value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
                         placeholder="e.g 200kWh" autoComplete="off" />
                       <div style={{ gridColumn: '1 / -1' }}>
@@ -278,7 +276,7 @@ export default function Step2Inverters({ onNext, onBack }: Props) {
                   {/* Installation Date */}
                   <div style={{ marginTop: 20 }}>
                     <div style={grid4}>
-                      <DateField label="Installation Date" requiredIndicator
+                      <DateField label="Installation Date"
                         value={entry.installationDate} onChange={v => update(entry.id, 'installationDate', v)} />
                     </div>
                   </div>

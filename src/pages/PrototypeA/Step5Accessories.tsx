@@ -187,21 +187,18 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                   <div style={grid3}>
                     <Select
                       label="Selected System Type"
-                      requiredIndicator
                       options={SYSTEM_TYPE_OPTIONS}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <Select
                       label="Choose Linked Inverter"
-                      requiredIndicator
                       options={INVERTER_OPTIONS}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
                     />
                     <Select
                       label="Choose Accessory Type"
-                      requiredIndicator
                       options={ACCESSORY_TYPE_OPTIONS}
                       value={entry.accessoryType}
                       onChange={v => update(entry.id, 'accessoryType', v)}
@@ -214,10 +211,10 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer" requiredIndicator
+                      <TextField label="Make/Manufacturer"
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
-                      <TextField label="Model" requiredIndicator
+                      <TextField label="Model"
                         value={entry.model} onChange={v => update(entry.id, 'model', v)}
                         placeholder="Enter model here" autoComplete="off" />
                       <TextField label="Serial Number"
@@ -230,7 +227,6 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
                         label="Equipment Status"
-                        requiredIndicator
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -325,7 +321,7 @@ export default function Step5Accessories({ onNext, onBack }: Props) {
                   {/* Installation Date */}
                   <div style={{ marginTop: 20 }}>
                     <div style={grid4}>
-                      <DateField label="Installation Date" requiredIndicator
+                      <DateField label="Installation Date"
                         value={entry.installationDate} onChange={v => update(entry.id, 'installationDate', v)} />
                     </div>
                   </div>

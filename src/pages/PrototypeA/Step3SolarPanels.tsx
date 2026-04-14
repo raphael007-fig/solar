@@ -169,14 +169,12 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                   <div style={grid2}>
                     <Select
                       label="Selected System Type"
-                      requiredIndicator
                       options={SYSTEM_TYPE_OPTIONS}
                       value={entry.systemType}
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <Select
                       label="Choose Linked Inverter"
-                      requiredIndicator
                       options={INVERTER_OPTIONS}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
@@ -189,10 +187,10 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Basic Information</Text>
                     </div>
                     <div style={grid4}>
-                      <TextField label="Make/Manufacturer" requiredIndicator
+                      <TextField label="Make/Manufacturer"
                         value={entry.make} onChange={v => update(entry.id, 'make', v)}
                         placeholder="Enter manufacturer here" autoComplete="off" />
-                      <TextField label="Model" requiredIndicator
+                      <TextField label="Model"
                         value={entry.model} onChange={v => update(entry.id, 'model', v)}
                         placeholder="Enter model here" autoComplete="off" />
                       <TextField label="Serial Number"
@@ -205,7 +203,6 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                     <div style={{ ...grid4, marginTop: 12 }}>
                       <Select
                         label="Equipment Status"
-                        requiredIndicator
                         options={EQUIPMENT_STATUS_OPTIONS}
                         value={entry.equipmentStatus}
                         onChange={v => update(entry.id, 'equipmentStatus', v)}
@@ -219,7 +216,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={{ maxWidth: 240 }}>
-                      <TextField label="Rated Power (Watts)" requiredIndicator
+                      <TextField label="Rated Power (Watts)"
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
                     </div>
@@ -297,7 +294,7 @@ export default function Step3SolarPanels({ onNext, onBack }: Props) {
                   {/* Installation Date */}
                   <div style={{ marginTop: 20 }}>
                     <div style={grid4}>
-                      <DateField label="Installation Date" requiredIndicator
+                      <DateField label="Installation Date"
                         value={entry.installationDate} onChange={v => update(entry.id, 'installationDate', v)} />
                     </div>
                   </div>
