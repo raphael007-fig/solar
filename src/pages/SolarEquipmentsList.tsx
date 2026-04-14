@@ -229,7 +229,6 @@ export default function SolarEquipmentsList() {
     }
   }, [location.state])
 
-  const hasData = addedSummary.length > 0 || SUMMARY_DATA.length > 0
   const allSummary    = [...addedSummary, ...SUMMARY_DATA]
   const allComponents = [...addedComponents, ...COMPONENT_DATA]
 
