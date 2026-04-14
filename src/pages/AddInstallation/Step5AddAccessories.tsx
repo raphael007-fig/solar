@@ -90,7 +90,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
     { title: 'Linked Inverter' },
     { title: 'Make' },
     { title: 'Model' },
-    { title: 'Capacity (kW)' },
+    { title: 'Accessory Type' },
     { title: 'Quantity' },
     { title: 'Equipment Status' },
     { title: '' },
@@ -149,7 +149,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
                       </IndexTable.Cell>
                       <IndexTable.Cell>{accessory.make || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>{accessory.model || '—'}</IndexTable.Cell>
-                      <IndexTable.Cell>{accessory.capacity || '—'}</IndexTable.Cell>
+                      <IndexTable.Cell>{accessory.accessoryType || '—'}</IndexTable.Cell>
                       <IndexTable.Cell>{accessory.quantity}</IndexTable.Cell>
                       <IndexTable.Cell>
                         <Badge tone={STATUS_TONES[accessory.equipmentStatus] ?? 'info'}>

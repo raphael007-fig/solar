@@ -19,7 +19,7 @@ export interface AccessoryFormData {
   serialNumber: string
   quantity: string
   equipmentStatus: string
-  capacity: string
+  accessoryType: string
   warrantyStart: string
   warrantyEnd: string
   maintenanceFrequency: string
@@ -56,6 +56,16 @@ const EQUIPMENT_STATUS_OPTIONS = [
   { label: 'Decommissioned',    value: 'Decommissioned' },
 ]
 
+const ACCESSORY_TYPE_OPTIONS = [
+  { label: 'Choose accessory type here', value: '' },
+  { label: 'Controller',        value: 'Controller' },
+  { label: 'Charge Controller', value: 'Charge Controller' },
+  { label: 'Circuit Breaker',   value: 'Circuit Breaker' },
+  { label: 'Surge Protector',   value: 'Surge Protector' },
+  { label: 'Monitoring System', value: 'Monitoring System' },
+  { label: 'Cable / Wiring',    value: 'Cable / Wiring' },
+]
+
 const MAINTENANCE_FREQ_OPTIONS = [
   { label: 'Select maintenance frequency here', value: '' },
   { label: 'Monthly',       value: 'Monthly' },
@@ -76,7 +86,7 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
     serialNumber:         initialData?.serialNumber         ?? '',
     quantity:             initialData?.quantity             ?? '1',
     equipmentStatus:      initialData?.equipmentStatus      ?? '',
-    capacity:             initialData?.capacity             ?? '',
+    accessoryType:        initialData?.accessoryType        ?? '',
     warrantyStart:        initialData?.warrantyStart        ?? '',
     warrantyEnd:          initialData?.warrantyEnd          ?? '',
     maintenanceFrequency: initialData?.maintenanceFrequency ?? '',
@@ -152,7 +162,15 @@ export default function AddAccessoryModal({ onClose, onSave, initialData }: Prop
       <Modal.Section>
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
-          <Text as="p" tone="subdued" variant="bodyMd">No accessory type has been selected.</Text>
+          <div style={grid4}>
+            <Select
+              label="Accessory Type"
+              requiredIndicator
+              options={ACCESSORY_TYPE_OPTIONS}
+              value={form.accessoryType}
+              onChange={set('accessoryType')}
+            />
+          </div>
         </BlockStack>
       </Modal.Section>
 
