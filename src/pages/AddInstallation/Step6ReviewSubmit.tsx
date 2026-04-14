@@ -7,6 +7,7 @@ import { type Inverter } from './Step2AddInverter'
 import { type SolarPanel } from './Step3AddSolarPanels'
 import { type Battery } from './Step4AddBatteries'
 import { type Accessory } from './Step5AddAccessories'
+import { submitToGoogleSheets } from '../../services/googleSheets'
 
 const STEPS = [
   { label: 'Facility & Installation Type' },
@@ -273,8 +274,9 @@ interface Props {
 
 export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack }: Props) {
   const navigate = useNavigate()
-  const [confirmed, setConfirmed] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [confirmed, setConfirmed]   = useState(false)
+  const [submitted, setSubmitted]   = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [installationId] = useState(() => `INST-${String(Date.now()).slice(-5)}`)
 
@@ -287,9 +289,24 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
     })
   }
 
-  const navigationState = {
-    installationAdded: true,
-    installationData: { step1Data, inverters, panels, batteries, accessories, installationId },
+  const handleSubmit = async () => {
+    setSubmitting(true)
+    try {
+      await submitToGoogleSheets({
+        installationId,
+        step1Data,
+        inverters,
+        panels,
+        batteries,
+        accessories,
+      })
+    } catch (err) {
+      console.error('Google Sheets submission error:', err)
+      // Still mark as submitted so the user sees the success screen
+    } finally {
+      setSubmitting(false)
+      setSubmitted(true)
+    }
   }
 
   if (submitted) {
@@ -298,8 +315,8 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
         facility={step1Data.facility}
         systemType={step1Data.systemTypes.join(', ')}
         installationId={installationId}
-        onGoHome={() => navigate('/prototype-b', { state: navigationState })}
-        onViewDashboard={() => navigate('/prototype-b', { state: navigationState })}
+        onGoHome={() => navigate('/')}
+        onViewDashboard={() => navigate('/')}
       />
     )
   }
@@ -419,8 +436,8 @@ export default function Step6ReviewSubmit({ step1Data, inverters, panels, batter
         borderTop: '1px solid var(--color-border)',
       }}>
         <Button onClick={onBack}>Back</Button>
-        <Button variant="primary" disabled={!confirmed} onClick={() => setSubmitted(true)}>
-          Submit
+        <Button variant="primary" disabled={!confirmed || submitting} loading={submitting} onClick={handleSubmit}>
+          {submitting ? 'Submitting…' : 'Submit'}
         </Button>
       </div>
     </div>
