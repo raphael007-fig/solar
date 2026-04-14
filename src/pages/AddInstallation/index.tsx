@@ -1,20 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppShell from '../../components/AppShell'
-import Step1FacilityType from './Step1FacilityType'
-import Step2AddInverter from './Step2AddInverter'
-import Step3AddSolarPanels from './Step3AddSolarPanels'
-import Step4AddBatteries from './Step4AddBatteries'
-import Step5AddAccessories from './Step5AddAccessories'
+import Step1FacilityType, { type Step1Data } from './Step1FacilityType'
+import Step2AddInverter, { type Inverter } from './Step2AddInverter'
+import Step3AddSolarPanels, { type SolarPanel } from './Step3AddSolarPanels'
+import Step4AddBatteries, { type Battery } from './Step4AddBatteries'
+import Step5AddAccessories, { type Accessory } from './Step5AddAccessories'
 import Step6ReviewSubmit from './Step6ReviewSubmit'
 
 export default function AddInstallation() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
 
-  const handleComplete = () => {
-    navigate('/', { state: { installationAdded: true } })
-  }
+  const [step1Data, setStep1Data] = useState<Step1Data>({ facility: '', systemTypes: [] })
+  const [inverters, setInverters] = useState<Inverter[]>([])
+  const [panels, setPanels] = useState<SolarPanel[]>([])
+  const [batteries, setBatteries] = useState<Battery[]>([])
+  const [accessories, setAccessories] = useState<Accessory[]>([])
 
   return (
     <AppShell breadcrumbs={['Home', 'Equipment Management', 'Solar Equipment']}>
@@ -41,39 +43,43 @@ export default function AddInstallation() {
         </p>
       </div>
 
-      {/* Wizard steps */}
       {step === 1 && (
         <Step1FacilityType
-          onNext={() => setStep(2)}
+          onNext={(data) => { setStep1Data(data); setStep(2) }}
           onBack={() => navigate('/')}
         />
       )}
       {step === 2 && (
         <Step2AddInverter
-          onNext={() => setStep(3)}
+          onNext={(data) => { setInverters(data); setStep(3) }}
           onBack={() => setStep(1)}
         />
       )}
       {step === 3 && (
         <Step3AddSolarPanels
-          onNext={() => setStep(4)}
+          onNext={(data) => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
         />
       )}
       {step === 4 && (
         <Step4AddBatteries
-          onNext={() => setStep(5)}
+          onNext={(data) => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
         />
       )}
       {step === 5 && (
         <Step5AddAccessories
-          onNext={() => setStep(6)}
+          onNext={(data) => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}
         />
       )}
       {step === 6 && (
         <Step6ReviewSubmit
+          step1Data={step1Data}
+          inverters={inverters}
+          panels={panels}
+          batteries={batteries}
+          accessories={accessories}
           onBack={() => setStep(5)}
         />
       )}

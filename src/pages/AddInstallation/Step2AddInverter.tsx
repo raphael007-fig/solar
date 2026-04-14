@@ -23,7 +23,7 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface Inverter extends InverterFormData {
+export interface Inverter extends InverterFormData {
   id: string
   name: string
   integratedBattery: string
@@ -40,7 +40,7 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: () => void
+  onNext: (inverters: Inverter[]) => void
   onBack: () => void
 }
 
@@ -206,7 +206,7 @@ export default function Step2AddInverter({ onNext, onBack }: Props) {
           <Button
             variant="primary"
             disabled={inverters.length === 0}
-            onClick={onNext}
+            onClick={() => onNext(inverters)}
           >
             Next
           </Button>

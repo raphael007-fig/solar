@@ -23,7 +23,7 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface Accessory extends AccessoryFormData {
+export interface Accessory extends AccessoryFormData {
   id: string
   name: string
 }
@@ -38,7 +38,7 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: () => void
+  onNext: (accessories: Accessory[]) => void
   onBack: () => void
 }
 
@@ -194,7 +194,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
           <Button
             variant="primary"
             disabled={accessories.length === 0}
-            onClick={onNext}
+            onClick={() => onNext(accessories)}
           >
             Next
           </Button>

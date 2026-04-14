@@ -69,8 +69,13 @@ interface DropdownRect {
   width: number
 }
 
+export interface Step1Data {
+  facility: string
+  systemTypes: string[]
+}
+
 interface Props {
-  onNext: () => void
+  onNext: (data: Step1Data) => void
   onBack: () => void
 }
 
@@ -334,7 +339,7 @@ export default function Step1FacilityType({ onNext, onBack }: Props) {
         <Button
           variant="primary"
           disabled={!canProceed}
-          onClick={onNext}
+          onClick={() => onNext({ facility, systemTypes: systemTypes.map(st => st.value) })}
         >
           Next
         </Button>

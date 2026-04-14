@@ -23,7 +23,7 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface Battery extends BatteryFormData {
+export interface Battery extends BatteryFormData {
   id: string
   name: string
 }
@@ -38,7 +38,7 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: () => void
+  onNext: (batteries: Battery[]) => void
   onBack: () => void
 }
 
@@ -196,7 +196,7 @@ export default function Step4AddBatteries({ onNext, onBack }: Props) {
           <Button
             variant="primary"
             disabled={batteries.length === 0}
-            onClick={onNext}
+            onClick={() => onNext(batteries)}
           >
             Next
           </Button>

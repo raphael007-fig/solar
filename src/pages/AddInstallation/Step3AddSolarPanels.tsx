@@ -23,7 +23,7 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-interface SolarPanel extends SolarPanelFormData {
+export interface SolarPanel extends SolarPanelFormData {
   id: string
   name: string
 }
@@ -38,7 +38,7 @@ const STATUS_TONES: Record<string, 'success' | 'critical' | 'warning' | 'attenti
 const PAGE_SIZE = 10
 
 interface Props {
-  onNext: () => void
+  onNext: (panels: SolarPanel[]) => void
   onBack: () => void
 }
 
@@ -194,7 +194,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
           <Button
             variant="primary"
             disabled={panels.length === 0}
-            onClick={onNext}
+            onClick={() => onNext(panels)}
           >
             Next
           </Button>

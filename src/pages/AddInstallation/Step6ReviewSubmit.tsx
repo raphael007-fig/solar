@@ -1,14 +1,12 @@
 import { useState } from 'react'
-import {
-  Button,
-  Text,
-  BlockStack,
-  InlineStack,
-  Checkbox,
-  Divider,
-} from '@shopify/polaris'
-import StepIndicator from '../../components/StepIndicator'
+import { Button, Text, BlockStack, InlineStack, Checkbox, Divider } from '@shopify/polaris'
 import { useNavigate } from 'react-router-dom'
+import StepIndicator from '../../components/StepIndicator'
+import { type Step1Data } from './Step1FacilityType'
+import { type Inverter } from './Step2AddInverter'
+import { type SolarPanel } from './Step3AddSolarPanels'
+import { type Battery } from './Step4AddBatteries'
+import { type Accessory } from './Step5AddAccessories'
 
 const STEPS = [
   { label: 'Facility & Installation Type' },
@@ -19,56 +17,95 @@ const STEPS = [
   { label: 'Review & Submit' },
 ]
 
-/* ── Placeholder review data ──────────────────────────── */
+/* ── Field helpers ───────────────────────────────────── */
 
-interface EquipmentItem {
-  id: string
-  name: string
-  fields: { label: string; value: string }[]
+function inverterFields(inv: Inverter) {
+  return [
+    { label: 'System Type',                value: inv.systemType },
+    { label: 'Make/Manufacturer',          value: inv.make },
+    { label: 'Model',                      value: inv.model },
+    { label: 'Serial Number',              value: inv.serialNumber || '—' },
+    { label: 'Quantity',                   value: inv.quantity },
+    { label: 'Equipment Status',           value: inv.equipmentStatus },
+    { label: 'Rated Power (Watts)',        value: inv.ratedPower || '—' },
+    { label: 'Voltage (V)',                value: inv.voltage || '—' },
+    { label: 'Capacity (kWh)',             value: inv.capacity || '—' },
+    { label: 'Integrated Battery',         value: inv.integratedBattery },
+    { label: 'Battery Capacity (kWh)',     value: inv.batteryCapacity || '—' },
+    { label: 'Warranty Start',             value: inv.warrantyStart || '—' },
+    { label: 'Warranty End',               value: inv.warrantyEnd || '—' },
+    { label: 'Maintenance Frequency',      value: inv.maintenanceFrequency || '—' },
+    { label: 'Last Maintenance',           value: inv.lastMaintenance || '—' },
+    { label: 'Installation Date',          value: inv.installationDate || '—' },
+    { label: 'Notes',                      value: inv.generalNotes || '—' },
+  ]
 }
 
-const COMMON_FIELDS = [
-  { label: 'Selected System Type', value: 'System Type 1 : Off-Grid' },
-  { label: 'Manufacturer/Make',    value: 'LG' },
-  { label: 'Model',                value: 'V12SE' },
-  { label: 'Serial Number',        value: '—' },
-  { label: 'Quantity',             value: '1' },
-  { label: 'Equipment Status',     value: 'Active' },
-  { label: 'Rated Power (Watts)',  value: '2000' },
-  { label: 'Voltage/Capacity',     value: '10' },
-  { label: 'Internal Battery Capacity (kWh)', value: '—' },
-  { label: 'Rated Power (Watts)',  value: '2000' },
-  { label: 'Warranty Start Date',  value: '26 Feb 2025' },
-  { label: 'Warranty End Date',    value: '26 Feb 2029' },
-  { label: 'Maintenance Frequency', value: 'Monthly' },
-  { label: 'Last Maintenance Date', value: '26 Feb 2025' },
-  { label: 'Next Maintenance Date', value: '26 Mar 2025' },
-  { label: 'Installation Date',    value: '26 Feb 2025' },
-  { label: 'Installation Report',  value: 'Grid_23.pdf' },
-  { label: 'Installed By',         value: 'Amari Tiko' },
-  { label: 'Uploaded Photo',       value: 'Grid_Image2.png' },
-  { label: 'Notes',                value: 'Power stabilizer/surge protector installed' },
-]
+function panelFields(p: SolarPanel) {
+  return [
+    { label: 'Linked Inverter',       value: p.linkedInverter || '—' },
+    { label: 'Panel Group',           value: p.panelGroup || '—' },
+    { label: 'Make/Manufacturer',     value: p.make },
+    { label: 'Model',                 value: p.model || '—' },
+    { label: 'Serial Number',         value: p.serialNumber || '—' },
+    { label: 'Quantity',              value: p.quantity },
+    { label: 'Equipment Status',      value: p.equipmentStatus },
+    { label: 'Rated Power (W)',       value: p.ratedPower || '—' },
+    { label: 'Warranty Start',        value: p.warrantyStart || '—' },
+    { label: 'Warranty End',          value: p.warrantyEnd || '—' },
+    { label: 'Maintenance Frequency', value: p.maintenanceFrequency || '—' },
+    { label: 'Last Maintenance',      value: p.lastMaintenance || '—' },
+    { label: 'Installation Date',     value: p.installationDate || '—' },
+    { label: 'Notes',                 value: p.generalNotes || '—' },
+  ]
+}
 
-const makeItems = (prefix: string, count: number): EquipmentItem[] =>
-  Array.from({ length: count }, (_, i) => ({
-    id:     `${prefix}-${i + 1}`,
-    name:   `${prefix} ${i + 1}`,
-    fields: COMMON_FIELDS,
-  }))
+function batteryFields(b: Battery) {
+  return [
+    { label: 'System Type',           value: b.systemType || '—' },
+    { label: 'Linked Inverter',       value: b.linkedInverter || '—' },
+    { label: 'Make/Manufacturer',     value: b.make },
+    { label: 'Model',                 value: b.model },
+    { label: 'Serial Number',         value: b.serialNumber || '—' },
+    { label: 'Quantity',              value: b.quantity },
+    { label: 'Equipment Status',      value: b.equipmentStatus },
+    { label: 'Battery Type',          value: b.batteryType || '—' },
+    { label: 'Capacity (kWh)',        value: b.capacity || '—' },
+    { label: 'Voltage (V)',           value: b.voltage || '—' },
+    { label: 'Warranty Start',        value: b.warrantyStart || '—' },
+    { label: 'Warranty End',          value: b.warrantyEnd || '—' },
+    { label: 'Maintenance Frequency', value: b.maintenanceFrequency || '—' },
+    { label: 'Last Maintenance',      value: b.lastMaintenance || '—' },
+    { label: 'Installation Date',     value: b.installationDate || '—' },
+    { label: 'Notes',                 value: b.generalNotes || '—' },
+  ]
+}
 
-const INVERTERS   = makeItems('Inverter', 3)
-const PANELS      = makeItems('Solar Panel', 3)
-const BATTERIES   = makeItems('Battery', 3)
-const ACCESSORIES = makeItems('Accessory', 1)
+function accessoryFields(a: Accessory) {
+  return [
+    { label: 'System Type',           value: a.systemType || '—' },
+    { label: 'Linked Inverter',       value: a.linkedInverter || '—' },
+    { label: 'Make/Manufacturer',     value: a.make },
+    { label: 'Model',                 value: a.model },
+    { label: 'Serial Number',         value: a.serialNumber || '—' },
+    { label: 'Quantity',              value: a.quantity },
+    { label: 'Equipment Status',      value: a.equipmentStatus },
+    { label: 'Accessory Type',        value: a.accessoryType || '—' },
+    { label: 'Warranty Start',        value: a.warrantyStart || '—' },
+    { label: 'Warranty End',          value: a.warrantyEnd || '—' },
+    { label: 'Maintenance Frequency', value: a.maintenanceFrequency || '—' },
+    { label: 'Last Maintenance',      value: a.lastMaintenance || '—' },
+    { label: 'Installation Date',     value: a.installationDate || '—' },
+    { label: 'Notes',                 value: a.generalNotes || '—' },
+  ]
+}
 
-/* ── Sub-components ──────────────────────────────────── */
+/* ── Accordion item ──────────────────────────────────── */
 
 function ChevronDown() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5"
-        strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }
@@ -76,22 +113,23 @@ function ChevronDown() {
 function ChevronRight() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5"
-        strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }
 
+interface Field { label: string; value: string }
+
 interface AccordionItemProps {
-  item: EquipmentItem
+  name: string
+  fields: Field[]
   expanded: boolean
   onToggle: () => void
 }
 
-function AccordionItem({ item, expanded, onToggle }: AccordionItemProps) {
+function AccordionItem({ name, fields, expanded, onToggle }: AccordionItemProps) {
   return (
     <div style={{ borderBottom: '1px solid var(--color-border)' }}>
-      {/* Header */}
       <button
         onClick={onToggle}
         style={{
@@ -99,28 +137,24 @@ function AccordionItem({ item, expanded, onToggle }: AccordionItemProps) {
           width: '100%', padding: '12px 0',
           background: 'none', border: 'none', cursor: 'pointer',
           font: 'var(--font-body-md-semibold)',
-          color: 'var(--color-text)',
-          textAlign: 'left',
+          color: 'var(--color-text)', textAlign: 'left',
         }}
       >
         {expanded ? <ChevronDown /> : <ChevronRight />}
-        {item.name}
+        {name}
       </button>
 
-      {/* Expanded detail grid */}
       {expanded && (
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '8px 24px',
-          padding: '8px 24px 20px',
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '8px 24px', padding: '4px 24px 20px',
         }}>
-          {item.fields.map((f, i) => (
+          {fields.map((f, i) => (
             <div key={i}>
               <span style={{ font: 'var(--font-body-sm-medium)', color: 'var(--color-text)' }}>
                 {f.label}:{' '}
               </span>
-              <span style={{ font: 'var(--font-body-sm)', color: 'var(--color-text)' }}>
+              <span style={{ font: 'var(--font-body-sm)', color: 'var(--color-text-secondary)' }}>
                 {f.value}
               </span>
             </div>
@@ -151,15 +185,18 @@ function SuccessIcon() {
 }
 
 interface SuccessPageProps {
+  facility: string
+  systemType: string
   onGoHome: () => void
 }
 
-function SuccessPage({ onGoHome }: SuccessPageProps) {
-  const [detailsOpen, setDetailsOpen] = useState(false)
+function SuccessPage({ facility, systemType, onGoHome }: SuccessPageProps) {
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  const installationId = `INST-${String(Date.now()).slice(-5)}`
 
   return (
     <div style={{
-      minHeight: '100vh', background: 'var(--color-bg)',
+      minHeight: '60vh',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: 24,
     }}>
@@ -169,27 +206,24 @@ function SuccessPage({ onGoHome }: SuccessPageProps) {
         padding: 40, width: '100%', maxWidth: 560,
         position: 'relative',
       }}>
-        {/* Go to Home Page link */}
         <button
           onClick={onGoHome}
           style={{
             position: 'absolute', top: 24, right: 24,
             background: 'none', border: 'none', cursor: 'pointer',
-            font: 'var(--font-body-md)',
-            color: 'var(--color-text-emphasis)',
+            font: 'var(--font-body-md)', color: 'var(--color-text-emphasis)',
           }}
         >
           Go to Home Page
         </button>
 
-        {/* Icon + Title */}
         <BlockStack gap="400" inlineAlign="center">
           <SuccessIcon />
+
           <Text variant="headingMd" as="h2" alignment="center">
             Installation Created Successfully
           </Text>
 
-          {/* Info card */}
           <div style={{
             background: '#EFF6FF', border: '1px solid #BFDBFE',
             borderRadius: 8, padding: '16px 20px', width: '100%',
@@ -197,20 +231,17 @@ function SuccessPage({ onGoHome }: SuccessPageProps) {
             <BlockStack gap="100">
               <InlineStack gap="200" blockAlign="center">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <rect x="2" y="1" width="10" height="13" rx="1.5"
-                    stroke="#3b82f6" strokeWidth="1.25" fill="none"/>
+                  <rect x="2" y="1" width="10" height="13" rx="1.5" stroke="#3b82f6" strokeWidth="1.25" fill="none"/>
                   <path d="M5 5h6M5 8h4" stroke="#3b82f6" strokeWidth="1.25" strokeLinecap="round"/>
                 </svg>
-                <Text as="span" variant="bodyMd" tone="magic">Facility: Nairobi Hospital</Text>
+                <Text as="span" variant="bodyMd" tone="magic">Facility: {facility || 'N/A'}</Text>
               </InlineStack>
-              <Text as="p" variant="bodyMd" tone="magic">Installation Type: Off-Grid</Text>
-              <Text as="p" variant="bodyMd" tone="magic">Date Installed: March 3, 2026</Text>
-              <Text as="p" variant="bodyMd" tone="magic">Region: Kenya</Text>
-              <Text as="p" variant="bodyMd" tone="magic">Installation ID: INST-12345</Text>
+              <Text as="p" variant="bodyMd" tone="magic">Installation Type: {systemType || 'N/A'}</Text>
+              <Text as="p" variant="bodyMd" tone="magic">Date Installed: {today}</Text>
+              <Text as="p" variant="bodyMd" tone="magic">Installation ID: {installationId}</Text>
             </BlockStack>
           </div>
 
-          {/* What next */}
           <Text as="p" variant="bodyMd">What would you like to do next?</Text>
 
           <InlineStack gap="200">
@@ -218,29 +249,6 @@ function SuccessPage({ onGoHome }: SuccessPageProps) {
             <Button onClick={onGoHome}>Link Another Accessory</Button>
             <Button onClick={onGoHome}>View Details</Button>
           </InlineStack>
-
-          {/* View installation details accordion */}
-          <div style={{ width: '100%', border: '1px solid var(--color-border)', borderRadius: 8 }}>
-            <button
-              onClick={() => setDetailsOpen(o => !o)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center',
-                justifyContent: 'space-between', padding: '12px 16px',
-                background: 'none', border: 'none', cursor: 'pointer',
-                font: 'var(--font-body-md)',
-              }}
-            >
-              <Text as="span" variant="bodyMd">View installation details</Text>
-              {detailsOpen ? <ChevronDown /> : <ChevronDown />}
-            </button>
-            {detailsOpen && (
-              <div style={{ padding: '0 16px 16px' }}>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  No additional details to show.
-                </Text>
-              </div>
-            )}
-          </div>
         </BlockStack>
       </div>
     </div>
@@ -250,16 +258,19 @@ function SuccessPage({ onGoHome }: SuccessPageProps) {
 /* ── Main component ──────────────────────────────────── */
 
 interface Props {
+  step1Data: Step1Data
+  inverters: Inverter[]
+  panels: SolarPanel[]
+  batteries: Battery[]
+  accessories: Accessory[]
   onBack: () => void
 }
 
-export default function Step6ReviewSubmit({ onBack }: Props) {
+export default function Step6ReviewSubmit({ step1Data, inverters, panels, batteries, accessories, onBack }: Props) {
   const navigate = useNavigate()
   const [confirmed, setConfirmed] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    new Set(['Inverter-3', 'Solar Panel-3', 'Battery-3'])
-  )
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   const toggle = (id: string) => {
     setExpandedIds(prev => {
@@ -271,15 +282,49 @@ export default function Step6ReviewSubmit({ onBack }: Props) {
   }
 
   if (submitted) {
-    return <SuccessPage onGoHome={() => navigate('/')} />
+    return (
+      <SuccessPage
+        facility={step1Data.facility}
+        systemType={step1Data.systemTypes.join(', ')}
+        onGoHome={() => navigate('/')}
+      />
+    )
   }
 
   const sections = [
-    { label: 'Inverters',   items: INVERTERS },
-    { label: 'Solar Panels', items: PANELS },
-    { label: 'Batteries',   items: BATTERIES },
-    { label: 'Accessories', items: ACCESSORIES },
-  ]
+    {
+      label: 'Inverters',
+      items: inverters.map((inv, i) => ({
+        id: `inv-${inv.id}`,
+        name: `Inverter ${i + 1}`,
+        fields: inverterFields(inv),
+      })),
+    },
+    {
+      label: 'Solar Panels',
+      items: panels.map((p, i) => ({
+        id: `panel-${p.id}`,
+        name: `Solar Panel ${i + 1}`,
+        fields: panelFields(p),
+      })),
+    },
+    {
+      label: 'Batteries',
+      items: batteries.map((b, i) => ({
+        id: `battery-${b.id}`,
+        name: `Battery ${i + 1}`,
+        fields: batteryFields(b),
+      })),
+    },
+    {
+      label: 'Accessories',
+      items: accessories.map((a, i) => ({
+        id: `accessory-${a.id}`,
+        name: `Accessory ${i + 1}`,
+        fields: accessoryFields(a),
+      })),
+    },
+  ].filter(s => s.items.length > 0)
 
   return (
     <div style={{ background: 'white', borderRadius: 8, overflow: 'visible' }}>
@@ -287,35 +332,41 @@ export default function Step6ReviewSubmit({ onBack }: Props) {
 
       <div style={{ padding: 24 }}>
         <BlockStack gap="500">
-
           {/* Installation Type summary */}
           <BlockStack gap="100">
             <Text variant="headingSm" as="h3">Installation Type</Text>
             <Text as="p" variant="bodyMd">
-              <strong>Location:</strong> Kenya
+              <strong>Facility:</strong> {step1Data.facility || '—'}
             </Text>
-            <Text as="p" variant="bodyMd">
-              <strong>System Type 1:</strong> Off-Grid
-            </Text>
+            {step1Data.systemTypes.map((st, i) => (
+              <Text key={i} as="p" variant="bodyMd">
+                <strong>System Type {i + 1}:</strong> {st}
+              </Text>
+            ))}
           </BlockStack>
 
           <Divider />
 
-          {/* Equipment accordion sections */}
-          {sections.map(section => (
-            <BlockStack key={section.label} gap="0">
-              {section.items.map(item => (
-                <AccordionItem
-                  key={item.id}
-                  item={item}
-                  expanded={expandedIds.has(item.id)}
-                  onToggle={() => toggle(item.id)}
-                />
-              ))}
-            </BlockStack>
-          ))}
+          {/* Equipment sections */}
+          {sections.length === 0 ? (
+            <Text as="p" tone="subdued" variant="bodyMd">No equipment added.</Text>
+          ) : (
+            sections.map(section => (
+              <BlockStack key={section.label} gap="0">
+                {section.items.map(item => (
+                  <AccordionItem
+                    key={item.id}
+                    name={item.name}
+                    fields={item.fields}
+                    expanded={expandedIds.has(item.id)}
+                    onToggle={() => toggle(item.id)}
+                  />
+                ))}
+              </BlockStack>
+            ))
+          )}
 
-          {/* Confirmation checkbox */}
+          {/* Confirmation */}
           <Checkbox
             label="I confirm all the information provided is accurate and up to date and I want to assign this training to the users."
             checked={confirmed}
@@ -331,11 +382,7 @@ export default function Step6ReviewSubmit({ onBack }: Props) {
         borderTop: '1px solid var(--color-border)',
       }}>
         <Button onClick={onBack}>Back</Button>
-        <Button
-          variant="primary"
-          disabled={!confirmed}
-          onClick={() => setSubmitted(true)}
-        >
+        <Button variant="primary" disabled={!confirmed} onClick={() => setSubmitted(true)}>
           Submit
         </Button>
       </div>
