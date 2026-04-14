@@ -49,7 +49,7 @@ export default function Step5AddAccessories({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(accessories as Array<{ id: string } & Record<string, unknown>>)
+    useIndexResourceState(accessories as unknown as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages      = Math.ceil(accessories.length / PAGE_SIZE)
   const paginated       = accessories.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)

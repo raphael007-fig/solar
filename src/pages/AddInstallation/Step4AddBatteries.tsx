@@ -49,7 +49,7 @@ export default function Step4AddBatteries({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(batteries as Array<{ id: string } & Record<string, unknown>>)
+    useIndexResourceState(batteries as unknown as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages     = Math.ceil(batteries.length / PAGE_SIZE)
   const paginated      = batteries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)

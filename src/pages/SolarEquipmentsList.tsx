@@ -154,13 +154,13 @@ export default function SolarEquipmentsList() {
     selectedResources: summarySelected,
     allResourcesSelected: summaryAllSelected,
     handleSelectionChange: summarySelectionChange,
-  } = useIndexResourceState(summaryData as Array<{ id: string } & Record<string, unknown>>)
+  } = useIndexResourceState(summaryData as unknown as Array<{ id: string } & Record<string, unknown>>)
 
   const {
     selectedResources: componentSelected,
     allResourcesSelected: componentAllSelected,
     handleSelectionChange: componentSelectionChange,
-  } = useIndexResourceState(componentData as Array<{ id: string } & Record<string, unknown>>)
+  } = useIndexResourceState(componentData as unknown as Array<{ id: string } & Record<string, unknown>>)
 
   /* ── Tabs ───────────────────────────────────────────── */
 

@@ -49,7 +49,7 @@ export default function Step3AddSolarPanels({ onNext, onBack }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(panels as Array<{ id: string } & Record<string, unknown>>)
+    useIndexResourceState(panels as unknown as Array<{ id: string } & Record<string, unknown>>)
 
   const totalPages   = Math.ceil(panels.length / PAGE_SIZE)
   const paginated    = panels.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
