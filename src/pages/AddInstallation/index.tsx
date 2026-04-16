@@ -63,7 +63,7 @@ export default function AddInstallation() {
       {step === 3 && (
         <Step3AddSolarPanels
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={panels}
           onNext={(data) => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
@@ -73,7 +73,7 @@ export default function AddInstallation() {
       {step === 4 && (
         <Step4AddBatteries
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={batteries}
           onNext={(data) => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
@@ -83,7 +83,7 @@ export default function AddInstallation() {
       {step === 5 && (
         <Step5AddAccessories
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={accessories}
           onNext={(data) => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}

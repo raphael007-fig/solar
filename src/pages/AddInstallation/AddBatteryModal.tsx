@@ -124,6 +124,13 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
   const set = (key: keyof BatteryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
+  const setSystemType = (v: string) =>
+    setForm(prev => ({ ...prev, systemType: v, linkedInverter: '' }))
+
+  const filteredInverters = form.systemType
+    ? inverterOptions.filter(o => o.systemType === form.systemType)
+    : []
+
   const lockMessage = (() => {
     if (form.systemType === 'Tied-Grid')
       return "The Grid-Tied System can't support batteries. Please select a different system to activate your batteries."
@@ -159,11 +166,11 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
               label={req("Selected System Type")}
               options={systemTypeOptions}
               value={form.systemType}
-              onChange={set('systemType')}
+              onChange={setSystemType}
             />
             <InverterSelect
               label={form.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
-              options={inverterOptions}
+              options={filteredInverters}
               value={form.linkedInverter}
               onChange={set('linkedInverter')}
             />

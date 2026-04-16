@@ -127,8 +127,16 @@ export default function Step5Accessories({ systemTypes, inverterOptions, initial
     e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.accessoryType
   )
 
+  const filteredInverters = (systemType: string) =>
+    systemType ? inverterOptions.filter(o => o.systemType === systemType) : []
+
   const update = (id: string, key: keyof AccessoryFormData, value: string | boolean) => {
-    setEntries(prev => prev.map(e => e.id === id ? { ...e, [key]: value } : e))
+    setEntries(prev => prev.map(e => {
+      if (e.id !== id) return e
+      const updated = { ...e, [key]: value }
+      if (key === 'systemType') updated.linkedInverter = ''
+      return updated
+    }))
   }
 
   const toggle = (id: string) => {
@@ -201,7 +209,7 @@ export default function Step5Accessories({ systemTypes, inverterOptions, initial
                     />
                     <InverterSelect
                       label={req('Choose Linked Inverter')}
-                      options={inverterOptions}
+                      options={filteredInverters(entry.systemType)}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
                     />

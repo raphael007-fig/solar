@@ -70,7 +70,7 @@ export default function PrototypeAWizard() {
       {step === 3 && (
         <Step3SolarPanels
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={panels}
           onNext={data => { setPanels(data); setStep(4) }}
           onBack={() => setStep(2)}
@@ -81,7 +81,7 @@ export default function PrototypeAWizard() {
       {step === 4 && (
         <Step4Batteries
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={batteries}
           onNext={data => { setBatteries(data); setStep(5) }}
           onBack={() => setStep(3)}
@@ -92,7 +92,7 @@ export default function PrototypeAWizard() {
       {step === 5 && (
         <Step5Accessories
           systemTypes={step1Data.systemTypes}
-          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, hasIntegratedBattery: inv.hasIntegratedBattery }))}
+          inverterOptions={inverters.map((inv, i) => ({ value: inv.name, make: inv.make, model: inv.model, index: i + 1, systemType: inv.systemType, hasIntegratedBattery: inv.hasIntegratedBattery }))}
           initialData={accessories}
           onNext={data => { setAccessories(data); setStep(6) }}
           onBack={() => setStep(4)}

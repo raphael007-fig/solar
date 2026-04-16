@@ -6,6 +6,7 @@ export interface InverterSelectOption {
   make:  string                  // e.g. "Huawei"
   model: string                  // e.g. "200005XE"
   index: number                  // 1-based display number
+  systemType: string             // system type this inverter belongs to
   hasIntegratedBattery?: boolean // true when inverter has built-in battery
 }
 
