@@ -106,7 +106,7 @@ export default function Step3SolarPanels({ systemTypes, inverterOptions, initial
   )
 
   const canProceed = entries.length > 0 && entries.every(e =>
-    e.systemType && (e.systemType === 'Order' || e.linkedInverter) && e.make && e.equipmentStatus && e.ratedPower
+    e.systemType && (e.systemType === 'Other' || e.linkedInverter) && e.make && e.equipmentStatus
   )
 
   const update = (id: string, key: keyof SolarPanelFormData, value: string | boolean) => {
@@ -182,7 +182,7 @@ export default function Step3SolarPanels({ systemTypes, inverterOptions, initial
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <InverterSelect
-                      label={entry.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
+                      label={entry.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
@@ -224,7 +224,7 @@ export default function Step3SolarPanels({ systemTypes, inverterOptions, initial
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={{ maxWidth: 240 }}>
-                      <TextField label={req('Rated Power (Watts)')}
+                      <TextField label="Rated Power (Watts)"
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
                     </div>

@@ -116,7 +116,7 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
   )
 
   const canProceed = entries.length > 0 && entries.every(e =>
-    e.systemType && (e.systemType === 'Order' || e.linkedInverter) && e.make && e.equipmentStatus && e.batteryType && e.voltage && e.capacity
+    e.systemType && (e.systemType === 'Other' || e.linkedInverter) && e.make && e.equipmentStatus
   )
 
   const update = (id: string, key: keyof BatteryFormData, value: string | boolean) => {
@@ -192,7 +192,7 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <InverterSelect
-                      label={entry.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
+                      label={entry.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}
@@ -235,15 +235,15 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
                     </div>
                     <div style={grid3}>
                       <Select
-                        label={req('Type of Battery')}
+                        label="Type of Battery"
                         options={BATTERY_TYPE_OPTIONS}
                         value={entry.batteryType}
                         onChange={v => update(entry.id, 'batteryType', v)}
                       />
-                      <TextField label={req('Capacity (kWh)')}
+                      <TextField label="Capacity (kWh)"
                         value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
                         placeholder="e.g 200kWh" autoComplete="off" />
-                      <TextField label={req('Voltage (V)')}
+                      <TextField label="Voltage (V)"
                         value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
                         placeholder="e.g 2000v" autoComplete="off" />
                     </div>

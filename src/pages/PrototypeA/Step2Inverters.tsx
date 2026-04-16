@@ -107,7 +107,7 @@ export default function Step2Inverters({ systemTypes, initialData, onNext, onBac
   )
 
   const canProceed = entries.length > 0 && entries.every(e =>
-    e.systemType && e.make && e.equipmentStatus && e.ratedPower && e.voltage && e.capacity
+    e.systemType && e.make && e.equipmentStatus
   )
 
   const update = (id: string, key: keyof InverterFormData, value: string | boolean) => {
@@ -221,13 +221,13 @@ export default function Step2Inverters({ systemTypes, initialData, onNext, onBac
                       <Text variant="headingSm" as="h4">Specifications</Text>
                     </div>
                     <div style={grid3}>
-                      <TextField label={req('Rated Power (Watts)')}
+                      <TextField label="Rated Power (Watts)"
                         value={entry.ratedPower} onChange={v => update(entry.id, 'ratedPower', v)}
                         placeholder="e.g 2000W" autoComplete="off" />
-                      <TextField label={req('Voltage (V)')}
+                      <TextField label="Voltage (V)"
                         value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
                         placeholder="e.g 2000v" autoComplete="off" />
-                      <TextField label={req('Capacity (kWh)')}
+                      <TextField label="Capacity (kWh)"
                         value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
                         placeholder="e.g 200kWh" autoComplete="off" />
                       <div style={{ gridColumn: '1 / -1' }}>

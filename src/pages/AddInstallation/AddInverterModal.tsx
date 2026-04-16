@@ -99,7 +99,7 @@ export default function AddInverterModal({ onClose, onSave, initialData, systemT
   const set = (key: keyof InverterFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const canSave = Boolean(form.systemType && form.make && form.equipmentStatus && form.ratedPower && form.voltage && form.capacity)
+  const canSave = Boolean(form.systemType && form.make && form.equipmentStatus)
 
   const handleSave = () => { onSave({ ...form }); onClose() }
 
@@ -156,13 +156,13 @@ export default function AddInverterModal({ onClose, onSave, initialData, systemT
         <BlockStack gap="300">
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid3}>
-            <TextField label={req("Rated Power (Watts)")}
+            <TextField label="Rated Power (Watts)"
               value={form.ratedPower} onChange={set('ratedPower')}
               placeholder="e.g 2000W" autoComplete="off" />
-            <TextField label={req("Voltage (V)")}
+            <TextField label="Voltage (V)"
               value={form.voltage} onChange={set('voltage')}
               placeholder="e.g 2000v" autoComplete="off" />
-            <TextField label={req("Capacity (kWh)")}
+            <TextField label="Capacity (kWh)"
               value={form.capacity} onChange={set('capacity')}
               placeholder="e.g 200kWh" autoComplete="off" />
             <div style={{ gridColumn: '1 / -1' }}>

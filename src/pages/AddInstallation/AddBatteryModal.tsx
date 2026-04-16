@@ -105,7 +105,7 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
   const set = (key: keyof BatteryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const canSave = Boolean(form.systemType && (form.systemType === 'Order' || form.linkedInverter) && form.make && form.equipmentStatus && form.batteryType && form.voltage && form.capacity)
+  const canSave = Boolean(form.systemType && (form.systemType === 'Other' || form.linkedInverter) && form.make && form.equipmentStatus)
 
   const handleSave = () => { onSave({ ...form }); onClose() }
 
@@ -129,7 +129,7 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
             onChange={set('systemType')}
           />
           <InverterSelect
-            label={form.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
+            label={form.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
             options={inverterOptions}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
@@ -169,15 +169,15 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
           <Text variant="headingSm" as="h3">Specifications</Text>
           <div style={grid3}>
             <Select
-              label={req("Type of Battery")}
+              label="Type of Battery"
               options={BATTERY_TYPE_OPTIONS}
               value={form.batteryType}
               onChange={set('batteryType')}
             />
-            <TextField label={req("Capacity (kWh)")}
+            <TextField label="Capacity (kWh)"
               value={form.capacity} onChange={set('capacity')}
               placeholder="e.g 200kWh" autoComplete="off" />
-            <TextField label={req("Voltage (V)")}
+            <TextField label="Voltage (V)"
               value={form.voltage} onChange={set('voltage')}
               placeholder="e.g 2000v" autoComplete="off" />
           </div>

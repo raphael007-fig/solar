@@ -38,12 +38,11 @@ const SYSTEM_TYPES = [
     ],
   },
   {
-    value: 'Order',
-    description: 'Equipment procurement order. Linked inverter is optional for panels and batteries.',
+    value: 'Other',
+    description: 'Open inventory. For direct-panel setups, solar fridges, etc.',
     tags: [
-      { label: 'Inverter', variant: 'green' },
-      { label: 'Panels',   variant: 'green' },
-      { label: 'Battery',  variant: 'green' },
+      { label: 'No Inverter Required', variant: 'blue' },
+      { label: 'Any Components',       variant: 'blue' },
     ],
   },
 ]
@@ -172,8 +171,8 @@ function SystemTypePopover({
                   borderRadius: 8,
                   font: '550 12px/16px var(--font-family)',
                   whiteSpace: 'nowrap',
-                  background: tag.variant === 'green' ? '#cdfee1' : 'rgba(0,0,0,0.06)',
-                  color:      tag.variant === 'green' ? '#0c5132' : '#616161',
+                  background: tag.variant === 'green' ? '#cdfee1' : tag.variant === 'blue' ? '#dde5ff' : 'rgba(0,0,0,0.06)',
+                  color:      tag.variant === 'green' ? '#0c5132' : tag.variant === 'blue' ? '#3b4fce' : '#616161',
                 }}
               >
                 {tag.label}
