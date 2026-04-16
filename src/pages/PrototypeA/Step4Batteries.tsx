@@ -103,6 +103,37 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
+function WarningBanner({ message }: { message: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 10,
+      padding: '12px 16px',
+      background: '#FFF4E5',
+      border: '1px solid #FFD591',
+      borderRadius: 8,
+      marginBottom: 4,
+    }}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+        <path d="M7.12 2.5a1 1 0 011.76 0l5.5 9.5A1 1 0 0113.5 13.5h-11a1 1 0 01-.88-1.5l5.5-9.5z" stroke="#F59E0B" strokeWidth="1.25" strokeLinejoin="round"/>
+        <path d="M8 6.5v3" stroke="#F59E0B" strokeWidth="1.25" strokeLinecap="round"/>
+        <circle cx="8" cy="11" r="0.75" fill="#F59E0B"/>
+      </svg>
+      <span style={{ fontSize: 13, color: '#7C4206', lineHeight: '20px' }}>{message}</span>
+    </div>
+  )
+}
+
+function getLockState(entry: BatteryEntry, inverterOptions: InverterSelectOption[]): { locked: boolean; message: string } {
+  if (entry.systemType === 'Tied-Grid') {
+    return { locked: true, message: "The Grid-Tied System can't support batteries. Please select a different system to activate your batteries." }
+  }
+  const inv = inverterOptions.find(o => o.value === entry.linkedInverter)
+  if (inv?.hasIntegratedBattery) {
+    return { locked: true, message: "The Inverter Selected can't support batteries. Please select a different system to activate your batteries." }
+  }
+  return { locked: false, message: '' }
+}
+
 export default function Step4Batteries({ systemTypes, inverterOptions, initialData, onNext, onBack, onStepClick }: Props) {
   const systemTypeOptions = [
     { label: 'Choose', value: '' },
@@ -115,9 +146,11 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
       : [emptyEntry(String(Date.now()))]
   )
 
-  const canProceed = entries.length > 0 && entries.every(e =>
-    e.systemType && (e.systemType === 'Other' || e.linkedInverter) && e.make && e.equipmentStatus
-  )
+  const canProceed = entries.length > 0 && entries.every(e => {
+    const { locked } = getLockState(e, inverterOptions)
+    if (locked) return true
+    return e.systemType && (e.systemType === 'Other' || e.linkedInverter) && e.make && e.equipmentStatus
+  })
 
   const update = (id: string, key: keyof BatteryFormData, value: string | boolean) => {
     setEntries(prev => prev.map(e => e.id === id ? { ...e, [key]: value } : e))
@@ -180,154 +213,164 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
             </div>
 
             {/* Accordion Body */}
-            {entry.expanded && (
-              <div style={{ padding: '20px', borderTop: '1px solid #e1e3e5' }}>
-                <BlockStack gap="400">
-                  {/* System Type + Linked Inverter */}
-                  <div style={grid2}>
-                    <Select
-                      label={req('Selected System Type')}
-                      options={systemTypeOptions}
-                      value={entry.systemType}
-                      onChange={v => update(entry.id, 'systemType', v)}
-                    />
-                    <InverterSelect
-                      label={entry.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
-                      options={inverterOptions}
-                      value={entry.linkedInverter}
-                      onChange={v => update(entry.id, 'linkedInverter', v)}
-                    />
-                  </div>
-
-                  {/* Basic Information */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ marginBottom: 12 }}>
-                      <Text variant="headingSm" as="h4">Basic Information</Text>
-                    </div>
-                    <div style={grid4}>
-                      <TextField label={req('Make/Manufacturer')}
-                        value={entry.make} onChange={v => update(entry.id, 'make', v)}
-                        placeholder="Enter manufacturer here" autoComplete="off" />
-                      <TextField label="Model"
-                        value={entry.model} onChange={v => update(entry.id, 'model', v)}
-                        placeholder="Enter model here" autoComplete="off" />
-                      <TextField label="Serial Number"
-                        value={entry.serialNumber} onChange={v => update(entry.id, 'serialNumber', v)}
-                        placeholder="Enter serial number here" autoComplete="off" />
-                      <TextField label="Quantity" type="number"
-                        value={entry.quantity} onChange={v => update(entry.id, 'quantity', v)}
-                        autoComplete="off" />
-                    </div>
-                    <div style={{ ...grid4, marginTop: 12 }}>
-                      <Select
-                        label={req('Equipment Status')}
-                        options={EQUIPMENT_STATUS_OPTIONS}
-                        value={entry.equipmentStatus}
-                        onChange={v => update(entry.id, 'equipmentStatus', v)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Specifications */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ marginBottom: 12 }}>
-                      <Text variant="headingSm" as="h4">Specifications</Text>
-                    </div>
-                    <div style={grid3}>
-                      <Select
-                        label="Type of Battery"
-                        options={BATTERY_TYPE_OPTIONS}
-                        value={entry.batteryType}
-                        onChange={v => update(entry.id, 'batteryType', v)}
-                      />
-                      <TextField label="Capacity (kWh)"
-                        value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
-                        placeholder="e.g 200kWh" autoComplete="off" />
-                      <TextField label="Voltage (V)"
-                        value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
-                        placeholder="e.g 2000v" autoComplete="off" />
-                    </div>
-                  </div>
-
-                  {/* Warranty */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ marginBottom: 12 }}>
-                      <Text variant="headingSm" as="h4">Warranty</Text>
-                    </div>
-                    <div style={grid4}>
-                      <DateField label="Warranty Start Date"
-                        value={entry.warrantyStart} onChange={v => update(entry.id, 'warrantyStart', v)} />
-                      <DateField label="Warranty End Date"
-                        value={entry.warrantyEnd} onChange={v => update(entry.id, 'warrantyEnd', v)} />
-                    </div>
-                  </div>
-
-                  {/* Maintenance */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ marginBottom: 12 }}>
-                      <Text variant="headingSm" as="h4">Maintenance</Text>
-                    </div>
-                    <div style={grid3}>
-                      <Select
-                        label="Maintenance Frequency"
-                        options={MAINTENANCE_FREQ_OPTIONS}
-                        value={entry.maintenanceFrequency}
-                        onChange={v => update(entry.id, 'maintenanceFrequency', v)}
-                      />
-                      <DateField
-                        label="Next Maintenance Date"
-                        value=""
-                        onChange={() => {}}
-                        helpText="This is calculated based on the maintenance frequency"
-                        disabled
-                      />
-                      <DateField label="Last Maintenance Date"
-                        value={entry.lastMaintenance} onChange={v => update(entry.id, 'lastMaintenance', v)} />
-                    </div>
-                  </div>
-
-                  {/* Uploads */}
-                  <div style={{ marginTop: 20 }}>
+            {entry.expanded && (() => {
+              const { locked, message } = getLockState(entry, inverterOptions)
+              return (
+                <div style={{ padding: '20px', borderTop: '1px solid #e1e3e5' }}>
+                  <BlockStack gap="400">
+                    {/* System Type + Linked Inverter */}
                     <div style={grid2}>
-                      <BlockStack gap="100">
-                        <Text as="span" variant="bodyMd">Upload Installation Report</Text>
-                        <Button icon={UploadIcon}>Add file</Button>
-                        <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
-                      </BlockStack>
-                      <BlockStack gap="100">
-                        <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
-                        <Button icon={UploadIcon}>Add file</Button>
-                        <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
-                      </BlockStack>
+                      <Select
+                        label={req('Selected System Type')}
+                        options={systemTypeOptions}
+                        value={entry.systemType}
+                        onChange={v => update(entry.id, 'systemType', v)}
+                      />
+                      <InverterSelect
+                        label={entry.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
+                        options={inverterOptions}
+                        value={entry.linkedInverter}
+                        onChange={v => update(entry.id, 'linkedInverter', v)}
+                      />
                     </div>
-                  </div>
 
-                  {/* General Notes */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={grid3}>
-                      <div style={{ gridColumn: 'span 2' }}>
-                        <TextField
-                          label="General Notes"
-                          value={entry.generalNotes}
-                          onChange={v => update(entry.id, 'generalNotes', v)}
-                          multiline={4}
-                          placeholder="Write here"
-                          autoComplete="off"
+                    {/* Warning banner */}
+                    {locked && <WarningBanner message={message} />}
+
+                    {/* Basic Information */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <Text variant="headingSm" as="h4">Basic Information</Text>
+                      </div>
+                      <div style={grid4}>
+                        <TextField label={req('Make/Manufacturer')}
+                          value={entry.make} onChange={v => update(entry.id, 'make', v)}
+                          placeholder="Enter manufacturer here" autoComplete="off" disabled={locked} />
+                        <TextField label="Model"
+                          value={entry.model} onChange={v => update(entry.id, 'model', v)}
+                          placeholder="Enter model here" autoComplete="off" disabled={locked} />
+                        <TextField label="Serial Number"
+                          value={entry.serialNumber} onChange={v => update(entry.id, 'serialNumber', v)}
+                          placeholder="Enter serial number here" autoComplete="off" disabled={locked} />
+                        <TextField label="Quantity" type="number"
+                          value={entry.quantity} onChange={v => update(entry.id, 'quantity', v)}
+                          autoComplete="off" disabled={locked} />
+                      </div>
+                      <div style={{ ...grid4, marginTop: 12 }}>
+                        <Select
+                          label={req('Equipment Status')}
+                          options={EQUIPMENT_STATUS_OPTIONS}
+                          value={entry.equipmentStatus}
+                          onChange={v => update(entry.id, 'equipmentStatus', v)}
+                          disabled={locked}
                         />
                       </div>
                     </div>
-                  </div>
 
-                  {/* Installation Date */}
-                  <div style={{ marginTop: 20 }}>
-                    <div style={grid4}>
-                      <DateField label="Installation Date"
-                        value={entry.installationDate} onChange={v => update(entry.id, 'installationDate', v)} />
+                    {/* Specifications */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <Text variant="headingSm" as="h4">Specifications</Text>
+                      </div>
+                      <div style={grid3}>
+                        <Select
+                          label="Type of Battery"
+                          options={BATTERY_TYPE_OPTIONS}
+                          value={entry.batteryType}
+                          onChange={v => update(entry.id, 'batteryType', v)}
+                          disabled={locked}
+                        />
+                        <TextField label="Capacity (kWh)"
+                          value={entry.capacity} onChange={v => update(entry.id, 'capacity', v)}
+                          placeholder="e.g 200kWh" autoComplete="off" disabled={locked} />
+                        <TextField label="Voltage (V)"
+                          value={entry.voltage} onChange={v => update(entry.id, 'voltage', v)}
+                          placeholder="e.g 2000v" autoComplete="off" disabled={locked} />
+                      </div>
                     </div>
-                  </div>
-                </BlockStack>
-              </div>
-            )}
+
+                    {/* Warranty */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <Text variant="headingSm" as="h4">Warranty</Text>
+                      </div>
+                      <div style={grid4}>
+                        <DateField label="Warranty Start Date"
+                          value={entry.warrantyStart} onChange={v => update(entry.id, 'warrantyStart', v)} disabled={locked} />
+                        <DateField label="Warranty End Date"
+                          value={entry.warrantyEnd} onChange={v => update(entry.id, 'warrantyEnd', v)} disabled={locked} />
+                      </div>
+                    </div>
+
+                    {/* Maintenance */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={{ marginBottom: 12 }}>
+                        <Text variant="headingSm" as="h4">Maintenance</Text>
+                      </div>
+                      <div style={grid3}>
+                        <Select
+                          label="Maintenance Frequency"
+                          options={MAINTENANCE_FREQ_OPTIONS}
+                          value={entry.maintenanceFrequency}
+                          onChange={v => update(entry.id, 'maintenanceFrequency', v)}
+                          disabled={locked}
+                        />
+                        <DateField
+                          label="Next Maintenance Date"
+                          value=""
+                          onChange={() => {}}
+                          helpText="This is calculated based on the maintenance frequency"
+                          disabled
+                        />
+                        <DateField label="Last Maintenance Date"
+                          value={entry.lastMaintenance} onChange={v => update(entry.id, 'lastMaintenance', v)} disabled={locked} />
+                      </div>
+                    </div>
+
+                    {/* Uploads */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={grid2}>
+                        <BlockStack gap="100">
+                          <Text as="span" variant="bodyMd">Upload Installation Report</Text>
+                          <Button icon={UploadIcon} disabled={locked}>Add file</Button>
+                          <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
+                        </BlockStack>
+                        <BlockStack gap="100">
+                          <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
+                          <Button icon={UploadIcon} disabled={locked}>Add file</Button>
+                          <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
+                        </BlockStack>
+                      </div>
+                    </div>
+
+                    {/* General Notes */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={grid3}>
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <TextField
+                            label="General Notes"
+                            value={entry.generalNotes}
+                            onChange={v => update(entry.id, 'generalNotes', v)}
+                            multiline={4}
+                            placeholder="Write here"
+                            autoComplete="off"
+                            disabled={locked}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Installation Date */}
+                    <div style={{ marginTop: 20, opacity: locked ? 0.45 : 1, pointerEvents: locked ? 'none' : 'auto' }}>
+                      <div style={grid4}>
+                        <DateField label="Installation Date"
+                          value={entry.installationDate} onChange={v => update(entry.id, 'installationDate', v)} disabled={locked} />
+                      </div>
+                    </div>
+                  </BlockStack>
+                </div>
+              )
+            })()}
           </div>
         ))}
 

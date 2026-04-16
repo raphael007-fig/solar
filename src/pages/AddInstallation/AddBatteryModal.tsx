@@ -78,6 +78,25 @@ function req(label: string) {
   return <>{label} <span style={{ color: '#d72c0d' }}>*</span></>
 }
 
+function WarningBanner({ message }: { message: string }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 10,
+      padding: '12px 16px',
+      background: '#FFF4E5',
+      border: '1px solid #FFD591',
+      borderRadius: 8,
+    }}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+        <path d="M7.12 2.5a1 1 0 011.76 0l5.5 9.5A1 1 0 0113.5 13.5h-11a1 1 0 01-.88-1.5l5.5-9.5z" stroke="#F59E0B" strokeWidth="1.25" strokeLinejoin="round"/>
+        <path d="M8 6.5v3" stroke="#F59E0B" strokeWidth="1.25" strokeLinecap="round"/>
+        <circle cx="8" cy="11" r="0.75" fill="#F59E0B"/>
+      </svg>
+      <span style={{ fontSize: 13, color: '#7C4206', lineHeight: '20px' }}>{message}</span>
+    </div>
+  )
+}
+
 export default function AddBatteryModal({ onClose, onSave, initialData, systemTypes, inverterOptions }: Props) {
   const systemTypeOptions = [
     { label: 'Select', value: '' },
@@ -105,9 +124,22 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
   const set = (key: keyof BatteryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const canSave = Boolean(form.systemType && (form.systemType === 'Other' || form.linkedInverter) && form.make && form.equipmentStatus)
+  const lockMessage = (() => {
+    if (form.systemType === 'Tied-Grid')
+      return "The Grid-Tied System can't support batteries. Please select a different system to activate your batteries."
+    const inv = inverterOptions.find(o => o.value === form.linkedInverter)
+    if (inv?.hasIntegratedBattery)
+      return "The Inverter Selected can't support batteries. Please select a different system to activate your batteries."
+    return ''
+  })()
+  const isLocked = lockMessage !== ''
 
-  const handleSave = () => { onSave({ ...form }); onClose() }
+  const canSave = isLocked || Boolean(form.systemType && (form.systemType === 'Other' || form.linkedInverter) && form.make && form.equipmentStatus)
+
+  const handleSave = () => {
+    if (isLocked) { onClose(); return }
+    onSave({ ...form }); onClose()
+  }
 
   return (
     <Modal
@@ -121,104 +153,118 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
     >
       {/* ── Selected System Type + Choose Linked Inverter ────── */}
       <Modal.Section>
-        <div style={grid4}>
-          <Select
-            label={req("Selected System Type")}
-            options={systemTypeOptions}
-            value={form.systemType}
-            onChange={set('systemType')}
-          />
-          <InverterSelect
-            label={form.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
-            options={inverterOptions}
-            value={form.linkedInverter}
-            onChange={set('linkedInverter')}
-          />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={grid4}>
+            <Select
+              label={req("Selected System Type")}
+              options={systemTypeOptions}
+              value={form.systemType}
+              onChange={set('systemType')}
+            />
+            <InverterSelect
+              label={form.systemType === 'Other' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
+              options={inverterOptions}
+              value={form.linkedInverter}
+              onChange={set('linkedInverter')}
+            />
+          </div>
+          {isLocked && <WarningBanner message={lockMessage} />}
         </div>
       </Modal.Section>
 
       {/* ── Basic Information ────────────────────────────────── */}
       <Modal.Section>
-        <BlockStack gap="300">
-          <Text variant="headingSm" as="h3">Basic Information</Text>
-          <div style={grid4}>
-            <TextField label={req("Make/Manufacturer")}
-              value={form.make} onChange={set('make')}
-              placeholder="Enter manufacturer here" autoComplete="off" />
-            <TextField label="Model"
-              value={form.model} onChange={set('model')}
-              placeholder="Enter model here" autoComplete="off" />
-            <TextField label="Serial Number"
-              value={form.serialNumber} onChange={set('serialNumber')}
-              placeholder="Enter serial number here" autoComplete="off" />
-            <TextField label="Quantity" type="number"
-              value={form.quantity} onChange={set('quantity')} autoComplete="off" />
-            <Select
-              label={req("Equipment Status")}
-              options={EQUIPMENT_STATUS_OPTIONS}
-              value={form.equipmentStatus}
-              onChange={set('equipmentStatus')}
-            />
-          </div>
-        </BlockStack>
+        <div style={{ opacity: isLocked ? 0.45 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}>
+          <BlockStack gap="300">
+            <Text variant="headingSm" as="h3">Basic Information</Text>
+            <div style={grid4}>
+              <TextField label={req("Make/Manufacturer")}
+                value={form.make} onChange={set('make')}
+                placeholder="Enter manufacturer here" autoComplete="off" disabled={isLocked} />
+              <TextField label="Model"
+                value={form.model} onChange={set('model')}
+                placeholder="Enter model here" autoComplete="off" disabled={isLocked} />
+              <TextField label="Serial Number"
+                value={form.serialNumber} onChange={set('serialNumber')}
+                placeholder="Enter serial number here" autoComplete="off" disabled={isLocked} />
+              <TextField label="Quantity" type="number"
+                value={form.quantity} onChange={set('quantity')} autoComplete="off" disabled={isLocked} />
+              <Select
+                label={req("Equipment Status")}
+                options={EQUIPMENT_STATUS_OPTIONS}
+                value={form.equipmentStatus}
+                onChange={set('equipmentStatus')}
+                disabled={isLocked}
+              />
+            </div>
+          </BlockStack>
+        </div>
       </Modal.Section>
 
       {/* ── Specifications ───────────────────────────────────── */}
       <Modal.Section>
-        <BlockStack gap="300">
-          <Text variant="headingSm" as="h3">Specifications</Text>
-          <div style={grid3}>
-            <Select
-              label="Type of Battery"
-              options={BATTERY_TYPE_OPTIONS}
-              value={form.batteryType}
-              onChange={set('batteryType')}
-            />
-            <TextField label="Capacity (kWh)"
-              value={form.capacity} onChange={set('capacity')}
-              placeholder="e.g 200kWh" autoComplete="off" />
-            <TextField label="Voltage (V)"
-              value={form.voltage} onChange={set('voltage')}
-              placeholder="e.g 2000v" autoComplete="off" />
-          </div>
-        </BlockStack>
+        <div style={{ opacity: isLocked ? 0.45 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}>
+          <BlockStack gap="300">
+            <Text variant="headingSm" as="h3">Specifications</Text>
+            <div style={grid3}>
+              <Select
+                label="Type of Battery"
+                options={BATTERY_TYPE_OPTIONS}
+                value={form.batteryType}
+                onChange={set('batteryType')}
+                disabled={isLocked}
+              />
+              <TextField label="Capacity (kWh)"
+                value={form.capacity} onChange={set('capacity')}
+                placeholder="e.g 200kWh" autoComplete="off" disabled={isLocked} />
+              <TextField label="Voltage (V)"
+                value={form.voltage} onChange={set('voltage')}
+                placeholder="e.g 2000v" autoComplete="off" disabled={isLocked} />
+            </div>
+          </BlockStack>
+        </div>
       </Modal.Section>
 
       {/* ── Warranty ─────────────────────────────────────────── */}
       <Modal.Section>
-        <BlockStack gap="300">
-          <Text variant="headingSm" as="h3">Warranty</Text>
-          <div style={grid4}>
-            <DateField label="Warranty Start Date"
-              value={form.warrantyStart} onChange={set('warrantyStart')} />
-            <DateField label="Warranty End Date"
-              value={form.warrantyEnd} onChange={set('warrantyEnd')} />
-          </div>
-        </BlockStack>
+        <div style={{ opacity: isLocked ? 0.45 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}>
+          <BlockStack gap="300">
+            <Text variant="headingSm" as="h3">Warranty</Text>
+            <div style={grid4}>
+              <DateField label="Warranty Start Date"
+                value={form.warrantyStart} onChange={set('warrantyStart')} disabled={isLocked} />
+              <DateField label="Warranty End Date"
+                value={form.warrantyEnd} onChange={set('warrantyEnd')} disabled={isLocked} />
+            </div>
+          </BlockStack>
+        </div>
       </Modal.Section>
 
       {/* ── Maintenance ──────────────────────────────────────── */}
       <Modal.Section>
-        <BlockStack gap="300">
-          <Text variant="headingSm" as="h3">Maintenance</Text>
-          <div style={grid3}>
-            <Select
-              label="Maintenance Frequency"
-              options={MAINTENANCE_FREQ_OPTIONS}
-              value={form.maintenanceFrequency}
-              onChange={set('maintenanceFrequency')}
-            />
-            <DateField
-              label="Next Maintenance Date"
-              value=""
-              onChange={() => {}}
-              helpText="This is calculated based on the maintenance frequency"
-              disabled
-            />
-            <DateField label="Last Maintenance Date"
-              value={form.lastMaintenance} onChange={set('lastMaintenance')} />
-          </div>
-        </BlockStack>
+        <div style={{ opacity: isLocked ? 0.45 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}>
+          <BlockStack gap="300">
+            <Text variant="headingSm" as="h3">Maintenance</Text>
+            <div style={grid3}>
+              <Select
+                label="Maintenance Frequency"
+                options={MAINTENANCE_FREQ_OPTIONS}
+                value={form.maintenanceFrequency}
+                onChange={set('maintenanceFrequency')}
+                disabled={isLocked}
+              />
+              <DateField
+                label="Next Maintenance Date"
+                value=""
+                onChange={() => {}}
+                helpText="This is calculated based on the maintenance frequency"
+                disabled
+              />
+              <DateField label="Last Maintenance Date"
+                value={form.lastMaintenance} onChange={set('lastMaintenance')} disabled={isLocked} />
+            </div>
+          </BlockStack>
+        </div>
       </Modal.Section>
 
       <Modal.Section>
@@ -227,39 +273,42 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
 
       {/* ── Installation + Uploads + Notes ───────────────────── */}
       <Modal.Section>
-        <BlockStack gap="500">
-          <div style={grid4}>
-            <DateField label="Installation Date"
-              value={form.installationDate} onChange={set('installationDate')} />
-          </div>
-
-          <div style={grid3}>
-            <BlockStack gap="100">
-              <Text as="span" variant="bodyMd">Upload Installation Report</Text>
-              <Button icon={UploadIcon}>Add file</Button>
-              <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
-            </BlockStack>
-
-            <BlockStack gap="100">
-              <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
-              <Button icon={UploadIcon}>Add file</Button>
-              <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
-            </BlockStack>
-          </div>
-
-          <div style={grid3}>
-            <div style={{ gridColumn: 'span 2' }}>
-              <TextField
-                label="General Notes"
-                value={form.generalNotes}
-                onChange={set('generalNotes')}
-                multiline={4}
-                placeholder="Write here"
-                autoComplete="off"
-              />
+        <div style={{ opacity: isLocked ? 0.45 : 1, pointerEvents: isLocked ? 'none' : 'auto' }}>
+          <BlockStack gap="500">
+            <div style={grid4}>
+              <DateField label="Installation Date"
+                value={form.installationDate} onChange={set('installationDate')} disabled={isLocked} />
             </div>
-          </div>
-        </BlockStack>
+
+            <div style={grid3}>
+              <BlockStack gap="100">
+                <Text as="span" variant="bodyMd">Upload Installation Report</Text>
+                <Button icon={UploadIcon} disabled={isLocked}>Add file</Button>
+                <Text tone="subdued" as="p" variant="bodySm">Upload up to 5 files (PDF or DOC), max 10 MB each.</Text>
+              </BlockStack>
+
+              <BlockStack gap="100">
+                <Text as="span" variant="bodyMd">Upload Photos (Equipment or installation site)</Text>
+                <Button icon={UploadIcon} disabled={isLocked}>Add file</Button>
+                <Text tone="subdued" as="p" variant="bodySm">Upload up to 3 images (JPEG, PNG), max 10 MB each.</Text>
+              </BlockStack>
+            </div>
+
+            <div style={grid3}>
+              <div style={{ gridColumn: 'span 2' }}>
+                <TextField
+                  label="General Notes"
+                  value={form.generalNotes}
+                  onChange={set('generalNotes')}
+                  multiline={4}
+                  placeholder="Write here"
+                  autoComplete="off"
+                  disabled={isLocked}
+                />
+              </div>
+            </div>
+          </BlockStack>
+        </div>
       </Modal.Section>
     </Modal>
   )

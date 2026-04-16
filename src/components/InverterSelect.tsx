@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 
 export interface InverterSelectOption {
-  value: string   // stored value (inverter name, e.g. "Inv 1")
-  make:  string   // e.g. "Huawei"
-  model: string   // e.g. "200005XE"
-  index: number   // 1-based display number
+  value: string                  // stored value (inverter name, e.g. "Inv 1")
+  make:  string                  // e.g. "Huawei"
+  model: string                  // e.g. "200005XE"
+  index: number                  // 1-based display number
+  hasIntegratedBattery?: boolean // true when inverter has built-in battery
 }
 
 interface Props {
