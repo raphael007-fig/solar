@@ -37,6 +37,15 @@ const SYSTEM_TYPES = [
       { label: 'No Battery', variant: 'gray' },
     ],
   },
+  {
+    value: 'Order',
+    description: 'Equipment procurement order. Linked inverter is optional for panels and batteries.',
+    tags: [
+      { label: 'Inverter', variant: 'green' },
+      { label: 'Panels',   variant: 'green' },
+      { label: 'Battery',  variant: 'green' },
+    ],
+  },
 ]
 
 const FACILITY_OPTIONS = [

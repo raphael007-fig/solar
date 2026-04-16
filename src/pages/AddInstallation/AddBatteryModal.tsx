@@ -105,7 +105,7 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
   const set = (key: keyof BatteryFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const canSave = Boolean(form.systemType && form.linkedInverter && form.make && form.equipmentStatus && form.batteryType && form.voltage && form.capacity)
+  const canSave = Boolean(form.systemType && (form.systemType === 'Order' || form.linkedInverter) && form.make && form.equipmentStatus && form.batteryType && form.voltage && form.capacity)
 
   const handleSave = () => { onSave({ ...form }); onClose() }
 
@@ -129,7 +129,7 @@ export default function AddBatteryModal({ onClose, onSave, initialData, systemTy
             onChange={set('systemType')}
           />
           <InverterSelect
-            label={req("Choose Linked Inverter")}
+            label={form.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
             options={inverterOptions}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}

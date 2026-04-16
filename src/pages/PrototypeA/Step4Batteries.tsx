@@ -116,7 +116,7 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
   )
 
   const canProceed = entries.length > 0 && entries.every(e =>
-    e.systemType && e.linkedInverter && e.make && e.equipmentStatus && e.batteryType && e.voltage && e.capacity
+    e.systemType && (e.systemType === 'Order' || e.linkedInverter) && e.make && e.equipmentStatus && e.batteryType && e.voltage && e.capacity
   )
 
   const update = (id: string, key: keyof BatteryFormData, value: string | boolean) => {
@@ -192,7 +192,7 @@ export default function Step4Batteries({ systemTypes, inverterOptions, initialDa
                       onChange={v => update(entry.id, 'systemType', v)}
                     />
                     <InverterSelect
-                      label={req('Choose Linked Inverter')}
+                      label={entry.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
                       options={inverterOptions}
                       value={entry.linkedInverter}
                       onChange={v => update(entry.id, 'linkedInverter', v)}

@@ -95,7 +95,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData, syste
   const set = (key: keyof SolarPanelFormData) =>
     (value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }))
 
-  const canSave = Boolean(form.systemType && form.linkedInverter && form.make && form.equipmentStatus && form.ratedPower)
+  const canSave = Boolean(form.systemType && (form.systemType === 'Order' || form.linkedInverter) && form.make && form.equipmentStatus && form.ratedPower)
 
   const handleSave = () => { onSave({ ...form }); onClose() }
 
@@ -119,7 +119,7 @@ export default function AddSolarPanelModal({ onClose, onSave, initialData, syste
             onChange={set('systemType')}
           />
           <InverterSelect
-            label={req("Choose Linked Inverter")}
+            label={form.systemType === 'Order' ? 'Choose Linked Inverter' : req('Choose Linked Inverter')}
             options={inverterOptions}
             value={form.linkedInverter}
             onChange={set('linkedInverter')}
